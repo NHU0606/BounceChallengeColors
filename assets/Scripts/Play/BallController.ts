@@ -1,4 +1,4 @@
-import { Score } from './Score';
+import { Score } from '../Score';
 import { _decorator, Component, EventTouch, input, Input, Node, Vec3 } from 'cc';
 const { ccclass, property } = _decorator;
 
@@ -17,12 +17,12 @@ export class BallController extends Component {
     
     protected onLoad(): void {
         this.score.node.active = false;
-        this.speed.x = 1; 
+        this.speed.x = 1.5; 
         this.node.position = new Vec3(0, 50, 0);
         setTimeout(() => {
             input.on(Input.EventType.TOUCH_START, this.onTouchStart, this);
             this.score.node.active = true;
-        }, 3000)
+        }, 3500)
     }
 
     private onTouchStart(event: EventTouch): void {
@@ -49,6 +49,10 @@ export class BallController extends Component {
             this.right = false;
             this.speed.x = 1;
         }
+        
         this.node.position = this.node.position.add(this.speed);
+    }
+
+    private resetPos(): void {
     }
 }
