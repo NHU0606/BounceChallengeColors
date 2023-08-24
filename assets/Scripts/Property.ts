@@ -101,6 +101,36 @@ export class Property extends Component {
     }
 
     @property({ type: Node })
+    private leftLine: Node;
+
+    public get LeftLine() : Node {
+        return this.leftLine;
+    }
+
+    @property({ type: Node })
+    private rightLine: Node;
+
+    
+    public get RightLine() : Node {
+        return this.rightLine;
+    }
+
+    @property({ type: Node })
+    private leftFakeLine: Node;
+
+    public get LeftFakeLine() : Node {
+        return this.leftFakeLine;
+    }
+
+    @property({ type: Node })
+    private rightFakeLine: Node;
+
+    
+    public get RightFakeLine() : Node {
+        return this.rightFakeLine;
+    }
+
+    @property({ type: Node })
     private topContain: Node;
 
     
@@ -167,6 +197,28 @@ export class Property extends Component {
     
     public get AnimTouchStar() : Node {
         return this.animTouchStar;
+    }
+
+    @property({ type: Node })
+    private nontifiOver: Node;
+    
+    public get NontifiOver() : Node {
+        return this.nontifiOver;
+    }
+
+    @property({ type: Prefab })
+    private boomColorPrefab: Prefab;
+
+    public get BoomColorPrefab(): Prefab {
+        return this.boomColorPrefab;
+    }
+
+    @property({ type: Node })
+    private boomColorContain: Node;
+
+    
+    public get BoomColorContain() : Node {
+        return this.boomColorContain;
     }
 }
 

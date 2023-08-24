@@ -5,7 +5,7 @@ const { ccclass, property } = _decorator;
 @ccclass('Score')
 export class Score extends Component {
     @property({ type: Label })
-    private scoreLabel: Label;
+    public scoreLabel: Label;
 
     @property({ type: Label })
     private starLabel: Label;

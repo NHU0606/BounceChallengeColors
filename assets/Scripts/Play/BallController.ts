@@ -17,7 +17,7 @@ export class BallController extends Component {
     
     protected onLoad(): void {
         this.score.node.active = false;
-        this.speed.x = 1.5; 
+        this.speed.x = 0.8; 
         this.node.position = new Vec3(0, 50, 0);
         setTimeout(() => {
             input.on(Input.EventType.TOUCH_START, this.onTouchStart, this);
