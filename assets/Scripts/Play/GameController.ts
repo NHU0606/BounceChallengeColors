@@ -1,14 +1,19 @@
-import { _decorator, Animation, Collider2D, color, Color, Component, Contact2DType, director, instantiate, IPhysics2DContact, Label, Node, Prefab, Sprite, tween, UIOpacity, Vec3 } from 'cc';
+import { _decorator, Animation, Collider2D, color, Color, Component, Contact2DType, director, find, instantiate, IPhysics2DContact, Label, Node, Prefab, Sprite, tween, UIOpacity, Vec3 } from 'cc';
 import { Score } from '../Score';
 import { Property } from '../Property';
 import { BallController } from './BallController';
+import { AudioController } from "../AudioController";
 import { GameView } from '../GameView';
+import { ShopValue } from '../ShopValue';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameController')
 export class GameController extends Component {
     @property({ type: Property })
     private property: Property;
+
+    @property({ type: AudioController })
+    private audioControl: AudioController;
 
     @property({ type: GameView})
     private gameView: GameView;
@@ -18,12 +23,13 @@ export class GameController extends Component {
 
     private countObstacle: number = 0;
     private ball: BallController;
+    private shop: number;
 
     private animContain: Animation | null = null;
     private animStar: Animation | null = null;
     private laneObstacle: boolean[][] = [];
     private createdObstacleCount: number = 0;
-    private obstacleColor: Color;
+    private obstacleColor: Color = new Color(131, 180, 255);
 
     protected onLoad(): void {
         setTimeout(()=> { 
@@ -40,6 +46,14 @@ export class GameController extends Component {
         for (let i = 0; i < 5; i++) {
             this.laneObstacle[i] = [];
         }
+
+        if ( find('Shop') === null ) {
+            this.shop = 0;
+        } else {
+            this.shop = find('Shop').getComponent(ShopValue).StoreModel;
+        }
+
+        this.property.BallSprite.spriteFrame = this.property.BallSpriteFrame[this.shop];
     }
 
     protected start(): void {
@@ -58,16 +72,18 @@ export class GameController extends Component {
         score: number
     ): void {
         const otherTag = otherCollider.tag;
-
         if ( otherTag === 1 ) {
+            this.audioControl.onAudioArray(1);
             this.score.minus3Heart();
         } else
         if ( otherTag === 3 ) {
+            this.audioControl.onAudioArray(1);
             this.score.minusHeart();
             this.animContain.play("BallGameOver");
             this.property.AnimContain.setPosition(this.property.BallNode.position.x, this.property.BallNode.position.y, 0);
 
         } else if ( otherTag === 4 ) {
+            this.audioControl.onAudioArray(3);
             this.score.addStar();
             this.animStar.play("TouchStar");
             this.property.AnimTouchStar.setPosition(this.property.BallNode.position.x, this.property.BallNode.position.y, 0);
@@ -84,6 +100,7 @@ export class GameController extends Component {
             }
 
         } else if ( otherTag === 5 ) {
+            this.audioControl.onAudioArray(1);
             this.score.minusHeart();
             this.animContain.play("BallGameOver");
             this.property.AnimContain.setPosition(this.property.BallNode.position.x, this.property.BallNode.position.y, 0);
@@ -99,7 +116,7 @@ export class GameController extends Component {
                 }
             }
         } else if ( otherTag === 6 ) {
-            
+            this.audioControl.onAudioArray(1);
             const newColor = this.gameView.getRandomColor();
             const leftLine = this.property.LeftLine.getComponent(Sprite);
             const leftFakeLine = this.property.LeftFakeLine.getComponent(Sprite);
@@ -130,9 +147,6 @@ export class GameController extends Component {
             }
 
             this.obstacleColor = leftLine.color;
-            console.log('this.obstacleColor', this.obstacleColor);
-            console.log('leftLine.color', leftLine.color);
-            
 
             this.applyColorToObstacles(this.property.LeftContain, leftLine.color);
             this.applyColorToObstacles(this.property.RightContain, leftLine.color);
@@ -155,8 +169,6 @@ export class GameController extends Component {
     }
 
     private createObstacle(side: 'left' | 'right', count: number, color: Color): void {
-        console.log('this.obstacleColor2', this.obstacleColor);
-
         const container = side === 'left' ? this.property.LeftContain : this.property.RightContain;
         const prefab = side === 'left' ? this.property.ObstaclePrefabLeft : this.property.ObstaclePrefabRight;
         
@@ -182,9 +194,9 @@ export class GameController extends Component {
             const obstacleInstance = instantiate(prefab);
             const spriteObstacle = obstacleInstance.getComponent(Sprite);
 
-            // if (spriteObstacle) {
-            //     spriteObstacle.color = color;
-            // }
+            if (spriteObstacle) {
+                spriteObstacle.color = color;
+            }
     
             const laneHeight = container.height / 5;
             const obstaclePosY = laneIndex * laneHeight;
@@ -213,12 +225,14 @@ export class GameController extends Component {
         }
         
         if (this.property.BallNode.position.x >= 218) {
+            this.audioControl.onAudioArray(4);
             this.animContain.play('BallBounce')
             this.property.AnimContain.setPosition(this.property.BallNode.position.x, this.property.BallNode.position.y, 0);
             this.createObstacle('left', this.countObstacle, this.obstacleColor);
             this.property.LeftContain.active = true;
             this.property.RightContain.active = false;
         } else if (this.property.BallNode.position.x <= -218) {
+            this.audioControl.onAudioArray(4);
             this.animContain.play('BallBounce');
             this.property.AnimContain.setPosition(this.property.BallNode.position.x, this.property.BallNode.position.y, 0);
             this.createObstacle('right', this.countObstacle, this.obstacleColor);
@@ -230,23 +244,18 @@ export class GameController extends Component {
             this.gameView.spawnStarPoint(3);
         }
 
-        if (this.score.currentScore > 1 && this.gameView.boomCount < 2 && this.score.currentScore % 3 === 0) {
+        if (this.score.currentScore > 1 && this.gameView.boomCount < 2 && this.score.currentScore % 5 === 0) {
             this.gameView.spawnBoom(2);
         }
 
-        if (this.score.currentScore > 1 && this.gameView.boomColorCount < 2 && this.score.currentScore % 1 === 0) {
+        if (this.score.currentScore > 1 && this.gameView.boomColorCount < 2 && this.score.currentScore % 10 === 0) {
             this.gameView.spawnBoomColor(1);
         }
 
         this.property.StarPointContain.active = this.score.currentScore % 4 === 0;
-        this.property.BoomContain.active = this.score.currentScore % 3 === 0;
-        this.property.BoomColorContain.active = this.score.currentScore % 1 === 0;
+        this.property.BoomContain.active = this.score.currentScore % 5 === 0;
+        this.property.BoomColorContain.active = this.score.currentScore % 10 === 0;
     }
-
-    
-
-    //-----------AUDIO---------------
-    
 }
 
 

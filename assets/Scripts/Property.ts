@@ -1,4 +1,4 @@
-import { _decorator, AnimationClip, Button, Component, Node, Prefab } from 'cc';
+import { _decorator, AnimationClip, Button, Component, Node, Prefab, Sprite, SpriteFrame } from 'cc';
 import { BallController } from './Play/BallController';
 import { PauseController } from './Play/PauseController';
 const { ccclass, property } = _decorator;
@@ -215,10 +215,30 @@ export class Property extends Component {
 
     @property({ type: Node })
     private boomColorContain: Node;
-
     
     public get BoomColorContain() : Node {
         return this.boomColorContain;
+    }
+
+    @property({ type: Node })
+    private containImgSoundContain: Node;
+    
+    public get ContainImgSoundContain() : Node {
+        return this.containImgSoundContain;
+    }
+
+    @property({ type: Sprite })
+    private ballSprite: Sprite;
+    
+    public get BallSprite() : Sprite {
+        return this.ballSprite;
+    }
+
+    @property({ type: [SpriteFrame] })
+    private ballSpriteFrame: SpriteFrame[] = [];
+
+    public get BallSpriteFrame(): SpriteFrame[] {
+        return this.ballSpriteFrame;
     }
 }
 

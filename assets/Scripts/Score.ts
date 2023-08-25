@@ -37,7 +37,7 @@ export class Score extends Component {
     }
 
     public addStar(): void {
-        this.updateStar(this.currentStar + 1);
+        this.updateStar(this.currentStar + 5);
     }
 
     public updateScore(num: number): void {

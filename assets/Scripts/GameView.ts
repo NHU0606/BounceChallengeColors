@@ -1,14 +1,17 @@
 import { Property } from './Property';
-
-import { _decorator, Color, Component, instantiate, Label, Node, Prefab, Sprite, SpriteFrame, tween, UIOpacity, Vec3 } from 'cc';
+import { _decorator, Color, Component, director, instantiate, Label, Node, Prefab, Sprite, SpriteFrame, tween, UIOpacity, Vec3 } from 'cc';
 import { Score } from './Score';
-import { Data } from './Data';
+import { AudioController } from "./AudioController";
+import { Data, SCENE_NAME } from './Data';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameView')
 export class GameView extends Component {
     @property({ type: Property})
     private property: Property;
+
+    @property({ type: AudioController })
+    private audioControl: AudioController;
 
     @property({ type: Score})
     private score: Score;
@@ -59,11 +62,12 @@ export class GameView extends Component {
         
         this.updateStars();
         setTimeout(()=> {
+            this.property.ContainImgSoundContain.active = true;
             this.property.GameNodeFake.active = false;
             this.property.NontifiOver.active = false;
             this.property.OverNode.active = true;
             this.showScoreResult();
-        }, 2500);
+        }, 2000);
     }
 
     private updateStars(): void {
@@ -124,16 +128,22 @@ export class GameView extends Component {
     }
 
     private onClickPause(): void {
+        this.audioControl.onAudioArray(5);
+
         let opacityBtnPause = this.property.PauseBtn.getComponent(UIOpacity)
         opacityBtnPause.opacity = 0;
         this.property.PauseInfo.active = true;
         this.property.PauseBtn.interactable = false;
         this.property.GameNode.active = false;
+        this.property.ContainImgSoundContain.active = true;
         this.property.TopContain.active = false;
         this.property.BottomContain.active = false;
     }
 
     private onClickContinue(): void {
+        this.audioControl.onAudioArray(5);
+        this.property.ContainImgSoundContain.active = false;
+
         let opacityBtnPause = this.property.PauseBtn.getComponent(UIOpacity)
         opacityBtnPause.opacity = 255;
         this.property.PauseInfo.active = false;
@@ -142,6 +152,8 @@ export class GameView extends Component {
         this.property.TopContain.active = true;
         this.property.BottomContain.active = true;
     }
+
+   
 
     //----------------SPAWN PREFAB------------------------
 
