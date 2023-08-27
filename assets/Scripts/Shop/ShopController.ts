@@ -1,7 +1,8 @@
-import { _decorator, Component, director, find, instantiate, Label, Node, Sprite, Vec3 } from 'cc';
+import { _decorator, Component, director, find, instantiate, Label, Node, Sprite, UITransform, Vec3 } from 'cc';
 import { ShopView } from './ShopView';
 import { ShopModel } from './ShopModel';
 import { ShopValue } from '../ShopValue';
+import { SCENE_NAME } from '../Data';
 const { ccclass, property } = _decorator;
 
 @ccclass('ShopController')
@@ -18,7 +19,7 @@ export class ShopController extends Component {
     private state: number[] = [0, 1, 1, 1, 1, 1, 1, 1, 1];
     private listItem: Node[] = [];
 
-    private scoreStore: number;
+    private scoreShop: number = 200;
     private newScore: number;
 
     protected onLoad(): void {
@@ -39,23 +40,53 @@ export class ShopController extends Component {
             const spriteBall = itemBallNode.getChildByName('Sprite').getComponent(Sprite);
             spriteBall.spriteFrame = this.shopModel.ItemTypeFrame[i];
             
-            let offsetX = -3 * 150 * 0.5 + 150 * 0.5;
-            let offsetY = -3 * 150 * 0.5 + 150 * 0.5;
-
             this.shopView.Container.addChild(itemBallNode);
-            const r = Math.floor(i / 3);
-            const c = i % 3;
-            const x = c * 150 + offsetX;
-            const y = r * 150 + offsetY;
-            itemBallNode.setPosition(new Vec3(x, -y, 0));
             this.listItem.push(itemBallNode);
         }
+        this.renderState();
     }
 
     protected renderState(): void {
         this.listItem.forEach((item, index) => {
-            
+            item.on(Node.EventType.TOUCH_START, () => {
+                if ( this.state[index] === 0 ) {
+                    this.shop.StoreModel = index;
+                    this.shopView.ChooseItemSprite.spriteFrame = this.shopModel.ItemTypeFrame[index];
+                    this.shopView.ChooseItem.getComponent(UITransform).setContentSize(120, 120);
+                    this.shopView.ChooseNode.active = true;
+                } else {
+                    if ( this.scoreShop >= this.cost[index] ) {
+                        this.newScore = this.scoreShop - this.cost[index];
+                        this.shopView.CostLabel.string = this.newScore.toString();
+
+                        this.state[index] = 0;
+                        this.cost[index] = 0;
+
+                        item.getChildByName('Label').getComponent(Label).string = this.cost[index].toString();
+                    } else {
+                        this.shopView.NoCost.active = true;
+                    }
+                }
+            })
         })
+    }
+
+    private onClickCloseBtnNoCost(): void {
+        this.shopView.NoCost.active = false;
+        this.shopView.LockChooseBtn.interactable = false;
+    }
+
+    private onClickChooseCloseBtn(): void {
+        this.shopView.LockNoCostBtn.interactable = false;
+        this.shopView.ChooseNode.active = false;
+    }
+
+    private onClickChooseBall(): void {
+        director.loadScene(SCENE_NAME.Play);
+    }
+
+    private onClickCloseMainBtn(): void {
+        director.loadScene(SCENE_NAME.Entry);
     }
 }
 

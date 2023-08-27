@@ -1,9 +1,13 @@
+import { AudioController } from "../AudioController";
 import { Score } from '../Score';
 import { _decorator, Component, EventTouch, input, Input, Node, Vec3 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('BallController')
 export class BallController extends Component {
+    @property({ type: AudioController })
+    private audioControl: AudioController;
+
     private speed: Vec3 = new Vec3(0, 0, 0); 
     private jump: boolean = false;
     private right: boolean = false;
@@ -28,18 +32,19 @@ export class BallController extends Component {
     private onTouchStart(event: EventTouch): void {
         this.jump = true;
         this.speed.y = 5; 
-        this.changeDirection();
+        this.audioControl.onAudioArray(6); 
     }
 
     protected update(dt: number): void {
         if (this.jump) {
-            this.speed.y -= 0.2; 
+            this.speed.y -= 0.15; 
             this.node.position = this.node.position.add(this.speed);
             this.changeDirection();
         }
     }
 
     private changeDirection(): void {
+
         if (this.node.position.x >= 220) {
             this.score.addScore();
             this.right = true;
