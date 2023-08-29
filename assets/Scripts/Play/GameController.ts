@@ -1,27 +1,5 @@
 import { StoreAPI } from "./../StoreAPI";
-import {
-  _decorator,
-  Animation,
-  Collider2D,
-  color,
-  Color,
-  Component,
-  Contact2DType,
-  director,
-  error,
-  find,
-  Input,
-  input,
-  instantiate,
-  IPhysics2DContact,
-  Label,
-  Node,
-  Prefab,
-  Sprite,
-  tween,
-  UIOpacity,
-  Vec3,
-} from "cc";
+import {  _decorator, Animation, Collider2D, Color, Component, Contact2DType, director, find, instantiate, IPhysics2DContact, Label, Node, Sprite, tween, Vec3} from "cc";
 import { Score } from "../Score";
 import { Property } from "../Property";
 import { BallController } from "./BallController";
@@ -64,6 +42,7 @@ export class GameController extends Component {
   private laneObstacle: boolean[][] = [];
   private createdObstacleCount: number = 0;
   private obstacleColor: Color = new Color(131, 180, 255);
+  private countTouch: number = 0;
 
   protected onLoad(): void {
     let parameters = find("GameClient");
@@ -173,14 +152,7 @@ export class GameController extends Component {
       const topLine = this.property.TopContain.getComponent(Sprite);
       const bottomLine = this.property.BottomContain.getComponent(Sprite);
       const scoreLabel = this.score.scoreLabel.getComponent(Label);
-      if (
-        leftLine ||
-        rightLine ||
-        topLine ||
-        leftFakeLine ||
-        rightFakeLine ||
-        scoreLabel
-      ) {
+      if ( leftLine || rightLine || topLine || leftFakeLine || rightFakeLine || scoreLabel) {
         leftLine.color = newColor;
         leftFakeLine.color = leftLine.color;
         rightLine.color = leftLine.color;
@@ -197,18 +169,15 @@ export class GameController extends Component {
 
           setTimeout(() => {
             boomsColor[i].active = true;
-          }, 7000);
+          }, 5000);
         }
       }
 
       this.obstacleColor = leftLine.color;
-
       this.applyColorToObstacles(this.property.LeftContain, leftLine.color);
       this.applyColorToObstacles(this.property.RightContain, leftLine.color);
     }
-    if (this.score.heart <= 0) {
-      this.gameOver();
-    }
+    if (this.score.heart <= 0) this.gameOver();
   }
 
   private applyColorToObstacles(container: Node, color: Color): void {
@@ -217,36 +186,21 @@ export class GameController extends Component {
     for (let i = 0; i < obstacleInstances.length; i++) {
       const obstacleInstance = obstacleInstances[i];
       const spriteObstacle = obstacleInstance.getComponent(Sprite);
-      if (spriteObstacle) {
-        spriteObstacle.color = color;
-      }
+      if (spriteObstacle) spriteObstacle.color = color;
     }
   }
 
-  private createObstacle(
-    side: "left" | "right",
-    count: number,
-    color: Color
-  ): void {
-    const container =
-      side === "left" ? this.property.LeftContain : this.property.RightContain;
-    const prefab =
-      side === "left"
-        ? this.property.ObstaclePrefabLeft
-        : this.property.ObstaclePrefabRight;
+  private createObstacle( side: "left" | "right", count: number, color: Color ): void {
+    const container = side === "left" ? this.property.LeftContain : this.property.RightContain;
+    const prefab = side === "left" ? this.property.ObstaclePrefabLeft : this.property.ObstaclePrefabRight;
 
     container.removeAllChildren();
 
     const selectedLaneIndices: number[] = [];
     let availableLaneIndices: number[] = [0, 1, 2, 3, 4];
 
-    while (
-      selectedLaneIndices.length < count &&
-      availableLaneIndices.length > 1
-    ) {
-      const randomIndex = Math.floor(
-        Math.random() * availableLaneIndices.length
-      );
+    while ( selectedLaneIndices.length < count && availableLaneIndices.length > 1 ) {
+      const randomIndex = Math.random() * availableLaneIndices.length;
       const laneIndex = availableLaneIndices[randomIndex];
 
       selectedLaneIndices.push(laneIndex);
@@ -268,11 +222,7 @@ export class GameController extends Component {
         const obstaclePosY = laneIndex * laneHeight;
 
         obstacleInstance.active = false;
-        const startPos = new Vec3(
-          side === "left" ? -300 : 300,
-          obstaclePosY,
-          0
-        );
+        const startPos = new Vec3(side === "left" ? -300 : 300, obstaclePosY, 0);
         const endPos = new Vec3(side === "left" ? 30 : -30, obstaclePosY, 0);
 
         tween(obstacleInstance)
@@ -286,30 +236,22 @@ export class GameController extends Component {
   }
 
   private changeDirectionBall(): void {
-    if (this.countObstacle <= 4) {
-      this.countObstacle = Math.floor(this.score.currentScore / 10) + 2;
-    }
+    if (this.countObstacle <= 4) this.countObstacle = (this.score.currentScore / 10) + 2;
 
     if (this.property.BallNode.position.x >= 218) {
+      this.countTouch++;
       this.audioControl.onAudioArray(4);
       this.animContain.play("BallBounce");
-      this.property.AnimContain.setPosition(
-        this.property.BallNode.position.x,
-        this.property.BallNode.position.y,
-        0
-      );
-      this.createObstacle("left", this.countObstacle, this.obstacleColor);
+      this.property.AnimContain.setPosition(this.property.BallNode.position.x, this.property.BallNode.position.y, 0);
+      // this.createObstacle("left", this.countObstacle, this.obstacleColor);
       this.property.LeftContain.active = true;
       this.property.RightContain.active = false;
     } else if (this.property.BallNode.position.x <= -218) {
+      this.countTouch++;
       this.audioControl.onAudioArray(4);
       this.animContain.play("BallBounce");
-      this.property.AnimContain.setPosition(
-        this.property.BallNode.position.x,
-        this.property.BallNode.position.y,
-        0
-      );
-      this.createObstacle("right", this.countObstacle, this.obstacleColor);
+      this.property.AnimContain.setPosition(this.property.BallNode.position.x, this.property.BallNode.position.y, 0);
+      // this.createObstacle("right", this.countObstacle, this.obstacleColor);
       this.property.LeftContain.active = false;
       this.property.RightContain.active = true;
     }
@@ -318,29 +260,24 @@ export class GameController extends Component {
       this.score.currentScore > 1 &&
       this.gameView.starPointCount < 2 &&
       this.score.currentScore % 2 === 0
-    ) {
-      this.gameView.spawnStarPoint(1);
-    }
+    ) this.gameView.spawnStarPoint(1);
+    
 
     if (
       this.score.currentScore > 1 &&
       this.gameView.boomCount < 2 &&
       this.score.currentScore % 5 === 0
-    ) {
-      this.gameView.spawnBoom(2);
-    }
-
+    ) this.gameView.spawnBoom(2);
+    
     if (
       this.score.currentScore > 1 &&
       this.gameView.boomColorCount < 2 &&
-      this.score.currentScore % 10 === 0
-    ) {
-      this.gameView.spawnBoomColor(1);
-    }
-
+      this.countTouch % 10 === 0
+    ) this.gameView.spawnBoomColor(1);
+    
     this.property.StarPointContain.active = this.score.currentScore % 2 === 0;
     this.property.BoomContain.active = this.score.currentScore % 5 === 0;
-    this.property.BoomColorContain.active = this.score.currentScore % 10 === 0;
+    this.property.BoomColorContain.active = this.countTouch % 10 === 0;
   }
   
   private async onClickReplay(): Promise<void> {
@@ -360,6 +297,8 @@ export class GameController extends Component {
   }
 
   private gameOver(): void {
+    console.log('heart', this.score.heart);
+    
     this.property.AnimContain.active = false;
     this.property.AnimTouchStar.active = false;
     this.property.LeftContain.active = false;
@@ -368,6 +307,7 @@ export class GameController extends Component {
     this.property.GameNode.active = false;
     this.property.PauseContain.active = false;
     this.property.NontifiOver.active = true;
+    this.property.BallNode.position = new Vec3(0, 50, 0);
 
     this.gameView.updateStars();
     setTimeout(() => {

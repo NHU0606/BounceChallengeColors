@@ -87,5 +87,12 @@ export class ShopView extends Component {
     public get LockNoCostBtn() : Button {
         return this.lockNoCostBtn;
     }
+
+    @property({ type: Button })
+    private chooseBtn: Button;
+    
+    public get ChooseBtn() : Button {
+        return this.chooseBtn;
+    }
 }
 

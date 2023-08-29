@@ -1897,6 +1897,9 @@
     "lockNoCostBtn": {
       "__id__": 83
     },
+    "chooseBtn": {
+      "__id__": 71
+    },
     "_id": "a81G+PEEtJTaQjCScWNACr"
   },
   {
@@ -2338,7 +2341,10 @@
       "b": 124,
       "a": 255
     },
-    "_normalSprite": null,
+    "_normalSprite": {
+      "__uuid__": "45872412-07ea-4a12-bf26-935236c445ef@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
     "_hoverSprite": null,
     "_pressedSprite": null,
     "_disabledSprite": null,

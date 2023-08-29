@@ -65,6 +65,7 @@ export class ShopController extends Component {
             this.shopView.Container.addChild(itemBallNode);
             this.listItem.push(itemBallNode);
         }
+        this.interacBtnShopTrue();
         this.renderState();
     }
 
@@ -119,13 +120,13 @@ export class ShopController extends Component {
     }
 
     private onClickChooseCloseBtn(): void {
-        this.interacBtnShop();
         this.audioControl.onAudioArray(5);
+        this.shopView.ChooseCloseBtn.interactable = false;
+        this.shopView.ChooseBtn.interactable = false;
         this.shopView.ChooseNode.active = false;
     }
 
     private async onClickChooseBall(): Promise<void> {
-        this.interacBtnShop();
         let parameters = find('GameClient');
         let gameClientParams = parameters.getComponent(StoreAPI);
         this.gameClient = gameClientParams.gameClient;
@@ -134,12 +135,15 @@ export class ShopController extends Component {
             .then((data) => {matchId = data.matchId})
             .catch((error) => console.log(error))
         gameClientParams.gameId = matchId;
+        this.shopView.ChooseCloseBtn.interactable = false;
+        this.shopView.ChooseBtn.interactable = false;
         this.audioControl.onAudioArray(5);
         director.loadScene(SCENE_NAME.Play);
     }
 
     private async onClickCloseMainBtn(): Promise<void> {
         this.interacBtnShop();
+        this.shopView.CloseMainBtn.interactable = false;
         let parameters = find('GameClient');
         let gameClientParams = parameters.getComponent(StoreAPI);
         this.gameClient = gameClientParams.gameClient;
@@ -152,11 +156,18 @@ export class ShopController extends Component {
     }
 
     private interacBtnShop(): void {
-        this.shopView.ChooseCloseBtn.interactable = false;
         this.shopView.NoCostCloseBtn.interactable = false;
-        this.shopView.CloseMainBtn.interactable = false;
         this.shopView.LockChooseBtn.interactable = false;
         this.shopView.LockNoCostBtn.interactable = false;
+    }
+
+    private interacBtnShopTrue(): void {
+        this.shopView.NoCostCloseBtn.interactable = true;
+        this.shopView.LockChooseBtn.interactable = true;
+        this.shopView.LockNoCostBtn.interactable = true;
+        this.shopView.ChooseCloseBtn.interactable = true;
+        this.shopView.ChooseBtn.interactable = true;
+        this.shopView.CloseMainBtn.interactable = true;
     }
 }
 

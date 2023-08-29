@@ -30,8 +30,8 @@ export class BallController extends Component {
     }
 
     private onTouchStart(event: EventTouch): void {
-        this.jump = true;
         this.speed.y = 4; 
+        this.jump = true;
         this.audioControl.onAudioArray(6); 
     }
     
@@ -44,7 +44,6 @@ export class BallController extends Component {
     }
 
     private changeDirection(): void {
-
         if (this.node.position.x >= 220) {
             this.score.addScore();
             this.right = true;
@@ -54,10 +53,6 @@ export class BallController extends Component {
             this.right = false;
             this.speed.x = 1;
         }
-        
         this.node.position = this.node.position.add(this.speed);
-    }
-
-    private resetPos(): void {
     }
 }

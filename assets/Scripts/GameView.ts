@@ -27,7 +27,7 @@ export class GameView extends Component {
         let opacityBtnPause = this.property.PauseBtn.getComponent(UIOpacity)
 
         opacityBtnPause.opacity = 0;
-        this.property.PauseBtn.interactable = true;
+        this.interacBtnTrue();
         this.property.OverNode.active = false;
         this.property.GameNode.active = true;
         this.property.LeftContain.active = false;
@@ -139,6 +139,12 @@ export class GameView extends Component {
         this.property.ReplayBtn.interactable = false;
         this.property.HomeBtn.interactable = false;
         this.property.ContinueBtn.interactable = false;
+    }
+
+    private interacBtnTrue(): void {
+        this.property.PauseBtn.interactable = true;
+        this.property.HomeBtn.interactable = true;
+        this.property.ContinueBtn.interactable = true;
     }
 
     private onClickShopBtn(): void {

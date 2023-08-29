@@ -67,10 +67,6 @@ export class AudioController extends Component {
     this.soundMachine.playOneShot(clip);
   }
 
-  public settingAudio(number: number): void {
-    this.soundMachine.volume = number;
-  }
-
   protected onAudio(): void {
     this.iconToShow.node.active = true;
     this.iconToHide.node.active = false;
