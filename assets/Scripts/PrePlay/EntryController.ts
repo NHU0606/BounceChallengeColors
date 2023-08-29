@@ -1,3 +1,4 @@
+import { StoreAPI } from './../StoreAPI';
 import {
   _decorator,
   AudioClip,
@@ -5,6 +6,8 @@ import {
   Button,
   Component,
   director,
+  error,
+  find,
   Node,
   sys,
 } from "cc";
@@ -14,11 +17,18 @@ const { ccclass, property } = _decorator;
 
 @ccclass("EntryController")
 export class EntryController extends Component {
+  private gameClient;
+  private matchId: string;
+
   @property({ type: AudioController })
   private audioControl: AudioController;
 
   @property({ type: Button })
   private playBtn: Button;
+
+  protected onLoad(): void {
+    this.playBtn.interactable = true;
+  }
 
   protected start(): void {
     try {
@@ -30,13 +40,20 @@ export class EntryController extends Component {
     }
   }
 
-  private onClickBtnPlay(): void {
+  private async onClickBtnPlay(): Promise<void> {
+    this.playBtn.interactable = false;
+    let _this = this;
+    let parameters = find('GameClient');
+    let gameClientParams = parameters.getComponent(StoreAPI);
+    this.gameClient = gameClientParams.gameClient;
+
+    await gameClientParams.gameClient.match.startMatch()
+      .then((data) => { _this.matchId = data.matchId })
+      .catch((error) => console.log(error))
+
+    gameClientParams.gameId = _this.matchId;
+    
     this.audioControl.onAudioArray(5);
     director.loadScene(SCENE_NAME.Play);
   }
-
-  private onClickShopBtn(): void {
-    this.audioControl.onAudioArray(5);
-    director.loadScene(SCENE_NAME.Shop);
-}
 }

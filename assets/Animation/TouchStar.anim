@@ -8,7 +8,7 @@
     },
     "_native": "",
     "sample": 60,
-    "speed": 1,
+    "speed": 2,
     "wrapMode": 1,
     "enableTrsBlending": false,
     "_duration": 0.7833333333333333,
@@ -222,7 +222,7 @@
     "__type__": "cc.RealCurve",
     "_times": [
       0,
-      0.7333333492279053
+      0.7333333333333333
     ],
     "_values": [
       {
@@ -235,9 +235,7 @@
         "leftTangent": 0,
         "leftTangentWeight": 1,
         "easingMethod": 0,
-        "__editorExtras__": {
-          "tangentMode": 0
-        }
+        "__editorExtras__": null
       },
       {
         "__type__": "cc.RealKeyframeValue",
@@ -249,9 +247,7 @@
         "leftTangent": 0,
         "leftTangentWeight": 1,
         "easingMethod": 0,
-        "__editorExtras__": {
-          "tangentMode": 0
-        }
+        "__editorExtras__": null
       }
     ],
     "preExtrapolation": 1,
@@ -267,7 +263,7 @@
     "__type__": "cc.RealCurve",
     "_times": [
       0,
-      0.7333333492279053
+      0.7333333333333333
     ],
     "_values": [
       {
@@ -280,9 +276,7 @@
         "leftTangent": 0,
         "leftTangentWeight": 1,
         "easingMethod": 0,
-        "__editorExtras__": {
-          "tangentMode": 0
-        }
+        "__editorExtras__": null
       },
       {
         "__type__": "cc.RealKeyframeValue",
@@ -294,9 +288,7 @@
         "leftTangent": 0,
         "leftTangentWeight": 1,
         "easingMethod": 0,
-        "__editorExtras__": {
-          "tangentMode": 0
-        }
+        "__editorExtras__": null
       }
     ],
     "preExtrapolation": 1,
@@ -312,7 +304,7 @@
     "__type__": "cc.RealCurve",
     "_times": [
       0,
-      0.7333333492279053
+      0.7333333333333333
     ],
     "_values": [
       {
@@ -325,9 +317,7 @@
         "leftTangent": 0,
         "leftTangentWeight": 1,
         "easingMethod": 0,
-        "__editorExtras__": {
-          "tangentMode": 0
-        }
+        "__editorExtras__": null
       },
       {
         "__type__": "cc.RealKeyframeValue",
@@ -339,9 +329,7 @@
         "leftTangent": 0,
         "leftTangentWeight": 1,
         "easingMethod": 0,
-        "__editorExtras__": {
-          "tangentMode": 0
-        }
+        "__editorExtras__": null
       }
     ],
     "preExtrapolation": 1,

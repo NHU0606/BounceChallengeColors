@@ -3,5 +3,10 @@
   "uuid": "26d572f6-89fb-4d0a-ba6e-7cee3f5126ce",
   "creator": {
     "version": "3.7.2"
+  },
+  "dependencies": {
+    "@onechaintech/gamesdk-beta": "^0.0.13",
+    "@onechaintech/gamesdk-dev": "^0.0.17",
+    "@onechaintech/gamesdk-stg": "^0.0.9"
   }
 }

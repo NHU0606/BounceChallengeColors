@@ -114,7 +114,7 @@ export class AudioController extends Component {
     this.audioBackground.volume = 0;
   }
 
-  onClickIcon() {
+  public onClickIcon() {
     this.isMuted = !this.isMuted;
     if (this.isMuted) {
       Data.soundStatic = 0;
@@ -125,12 +125,12 @@ export class AudioController extends Component {
     }
   }
 
-  onToggleButtonClicked() {
+  public onToggleButtonClicked() {
     this.isIconShown = !this.isIconShown;
     this.updateIconsVisibility();
   }
 
-  updateIconsVisibility() {
+  public updateIconsVisibility() {
     this.iconToShow.node.active = this.isIconShown;
     this.iconToHide.node.active = !this.isIconShown;
   }

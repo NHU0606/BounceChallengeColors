@@ -2,7 +2,7 @@ import { Property } from './Property';
 import { _decorator, Color, Component, director, instantiate, Label, Node, Prefab, Sprite, SpriteFrame, tween, UIOpacity, Vec3 } from 'cc';
 import { Score } from './Score';
 import { AudioController } from "./AudioController";
-import { Data, SCENE_NAME } from './Data';
+import { Data, DataUser, SCENE_NAME } from './Data';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameView')
@@ -19,12 +19,6 @@ export class GameView extends Component {
     public starPointCount: number = 0;
     public boomCount: number = 0;
     public boomColorCount: number = 0;
-
-    @property({type: Label})
-    private highScore: Label;
-
-    @property({type: Label})
-    private urScore: Label;
 
     @property({ type: [Node] }) 
     private starEnd: Node[] = [];
@@ -46,35 +40,16 @@ export class GameView extends Component {
             this.property.TopInfoContain.active = true;
         }, 4000);
 
-
         for ( let i = 0; i < this.starEnd.length; i++) {
             this.starEnd[i].active = false;
         }
     }
 
-    public gameOver(): void {
-        this.property.LeftContain.active = false;
-        this.property.RightContain.active = false;
-        this.overTopBottom();
-        this.property.GameNode.active = false;
-        this.property.PauseContain.active = false;
-        this.property.NontifiOver.active = true;
-        
-        this.updateStars();
-        setTimeout(()=> {
-            this.property.ContainImgSoundContain.active = true;
-            this.property.GameNodeFake.active = false;
-            this.property.NontifiOver.active = false;
-            this.property.OverNode.active = true;
-            this.showScoreResult();
-        }, 2000);
-    }
-
-    private updateStars(): void {
+    public updateStars(): void {
         let score = this.score.currentScore;
         let starsToShow = 0;
 
-        if (score >= 100) {
+        if (score > 99) {
             starsToShow = 3;
         } else if (score >= 50 && score <= 99) {
             starsToShow = 2;
@@ -130,6 +105,7 @@ export class GameView extends Component {
     private onClickPause(): void {
         this.audioControl.onAudioArray(5);
 
+      this.property.ShopBtn.node.active = true;
         let opacityBtnPause = this.property.PauseBtn.getComponent(UIOpacity)
         opacityBtnPause.opacity = 0;
         this.property.PauseInfo.active = true;
@@ -140,8 +116,9 @@ export class GameView extends Component {
         this.property.BottomContain.active = false;
     }
 
-    private onClickContinue(): void {
+    private onClickContinuePause(): void {
         this.audioControl.onAudioArray(5);
+        this.property.ShopBtn.node.active = false;
         this.property.ContainImgSoundContain.active = false;
 
         let opacityBtnPause = this.property.PauseBtn.getComponent(UIOpacity)
@@ -153,7 +130,21 @@ export class GameView extends Component {
         this.property.BottomContain.active = true;
     }
 
-   
+    private onClickHomePause(): void {
+        this.interactableBtnPause();
+        director.loadScene(SCENE_NAME.Entry);
+    }
+
+    public interactableBtnPause(): void {
+        this.property.ReplayBtn.interactable = false;
+        this.property.HomeBtn.interactable = false;
+        this.property.ContinueBtn.interactable = false;
+    }
+
+    private onClickShopBtn(): void {
+        this.audioControl.onAudioArray(5);
+        director.loadScene(SCENE_NAME.Shop);
+    }
 
     //----------------SPAWN PREFAB------------------------
 
@@ -169,6 +160,7 @@ export class GameView extends Component {
             const randomY = Math.random() * (maxY * 2) - maxY;
     
             objectInstance.setPosition(randomX, randomY, 0);
+            objectInstance.active = true;
             container.addChild(objectInstance);
         }
         return count;
@@ -178,6 +170,7 @@ export class GameView extends Component {
         const starPrefab = this.property.StarPoint;
         const starContain = this.property.StarPointContain;
     
+        starContain.removeAllChildren();
         this.starPointCount += this.spawnPrefab(starPrefab, starContain, count);
     }
     
@@ -185,6 +178,7 @@ export class GameView extends Component {
         const boomPrefab = this.property.BoomPrefab;
         const boomContain = this.property.BoomContain;
     
+        boomContain.removeAllChildren();
         this.boomCount += this.spawnPrefab(boomPrefab, boomContain, count);
     }
 
@@ -192,31 +186,22 @@ export class GameView extends Component {
         const boomColorPrefab = this.property.BoomColorPrefab;
         const boomColorContain = this.property.BoomColorContain;
     
+        boomColorContain.removeAllChildren();
         this.boomColorCount += this.spawnPrefab(boomColorPrefab, boomColorContain, count);
     }
 
-
-    public showScoreResult() {
-        try {
-            let maxScore = parseInt(localStorage.getItem(Data.highscore));
-            this.highScore.string = String(maxScore);
-            this.urScore.string = String(this.score.currentScore);
-        } catch (error) {
-            this.highScore.string = String(Data.highScoreStatic);
-            this.urScore.string = String(this.score.currentScore);
-        }
-    }
-
+ 
     public getRandomColor(): Color {
         const colors = [
             new Color(255,183,183),  
-            new Color(112,145,245),   
+            new Color(228,228,208),   
             new Color(168,223,142), 
             new Color(240,184,110), 
             new Color(173,196,206), 
             new Color(161,204,209), 
-            new Color(255,144,187), 
+            new Color(182,234,218), 
             new Color(160,196,157), 
+            new Color(150,182,197), 
         ];
     
         const randomIndex = Math.floor(Math.random() * colors.length);

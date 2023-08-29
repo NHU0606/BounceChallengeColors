@@ -31,10 +31,10 @@ export class BallController extends Component {
 
     private onTouchStart(event: EventTouch): void {
         this.jump = true;
-        this.speed.y = 5; 
+        this.speed.y = 4; 
         this.audioControl.onAudioArray(6); 
     }
-
+    
     protected update(dt: number): void {
         if (this.jump) {
             this.speed.y -= 0.15; 

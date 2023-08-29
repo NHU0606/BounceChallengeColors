@@ -206,6 +206,13 @@ export class Property extends Component {
         return this.nontifiOver;
     }
 
+    @property({ type: Node })
+    private nontifiWin: Node;
+    
+    public get NontifiWin() : Node {
+        return this.nontifiWin;
+    }
+
     @property({ type: Prefab })
     private boomColorPrefab: Prefab;
 
@@ -239,6 +246,36 @@ export class Property extends Component {
 
     public get BallSpriteFrame(): SpriteFrame[] {
         return this.ballSpriteFrame;
+    }
+
+    // pause btn
+    @property({ type: Button })
+    private homeBtn: Button;
+
+    public get HomeBtn() : Button {
+        return this.homeBtn;
+    }
+
+    @property({ type: Button })
+    private replayBtn: Button;
+
+    
+    public get ReplayBtn() : Button {
+        return this.replayBtn;
+    }
+
+    @property({ type: Button })
+    private continueBtn: Button;
+    
+    public get ContinueBtn() : Button {
+        return this.continueBtn;
+    }
+    
+    @property({ type: Button })
+    private shopBtn: Button;
+    
+    public get ShopBtn() : Button {
+        return this.shopBtn;
     }
 }
 
