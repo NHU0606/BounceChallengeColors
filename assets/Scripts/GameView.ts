@@ -16,9 +16,9 @@ export class GameView extends Component {
     @property({ type: Score})
     private score: Score;
 
-    public starPointCount: number = 0;
-    public boomCount: number = 0;
-    public boomColorCount: number = 0;
+    // public starPointCount: number = 0;
+    // public boomCount: number = 0;
+    // public boomColorCount: number = 0;
 
     @property({ type: [Node] }) 
     private starEnd: Node[] = [];
@@ -155,47 +155,47 @@ export class GameView extends Component {
 
     //----------------SPAWN PREFAB------------------------
 
-    private spawnPrefab(prefab: Prefab, container: Node, count: number) {
-        container.removeAllChildren();
+    // private spawnPrefab(prefab: Prefab, container: Node, count: number) {
+    //     container.removeAllChildren();
     
-        for (let i = 0; i < count; i++) {
-            const objectInstance = instantiate(prefab);
+    //     for (let i = 0; i < count; i++) {
+    //         const objectInstance = instantiate(prefab);
     
-            const maxX = container.width / 2;
-            const maxY = container.height / 2;
-            const randomX = Math.random() * (maxX * 2) - maxX;
-            const randomY = Math.random() * (maxY * 2) - maxY;
+    //         const maxX = container.width / 2;
+    //         const maxY = container.height / 2;
+    //         const randomX = Math.random() * (maxX * 2) - maxX;
+    //         const randomY = Math.random() * (maxY * 2) - maxY;
     
-            objectInstance.setPosition(randomX, randomY, 0);
-            objectInstance.active = true;
-            container.addChild(objectInstance);
-        }
-        return count;
-    }
+    //         objectInstance.setPosition(randomX, randomY, 0);
+    //         objectInstance.active = true;
+    //         container.addChild(objectInstance);
+    //     }
+    //     return count;
+    // }
 
-    public spawnStarPoint(count: number): void {
-        const starPrefab = this.property.StarPoint;
-        const starContain = this.property.StarPointContain;
+    // public spawnStarPoint(count: number): void {
+    //     const starPrefab = this.property.StarPoint;
+    //     const starContain = this.property.StarPointContain;
     
-        starContain.removeAllChildren();
-        this.starPointCount += this.spawnPrefab(starPrefab, starContain, count);
-    }
+    //     starContain.removeAllChildren();
+    //     this.starPointCount += this.spawnPrefab(starPrefab, starContain, count);
+    // }
     
-    public spawnBoom(count: number): void {
-        const boomPrefab = this.property.BoomPrefab;
-        const boomContain = this.property.BoomContain;
+    // public spawnBoom(count: number): void {
+    //     const boomPrefab = this.property.BoomPrefab;
+    //     const boomContain = this.property.BoomContain;
     
-        boomContain.removeAllChildren();
-        this.boomCount += this.spawnPrefab(boomPrefab, boomContain, count);
-    }
+    //     boomContain.removeAllChildren();
+    //     this.boomCount += this.spawnPrefab(boomPrefab, boomContain, count);
+    // }
 
-    public spawnBoomColor(count: number): void {
-        const boomColorPrefab = this.property.BoomColorPrefab;
-        const boomColorContain = this.property.BoomColorContain;
+    // public spawnBoomColor(count: number): void {
+    //     const boomColorPrefab = this.property.BoomColorPrefab;
+    //     const boomColorContain = this.property.BoomColorContain;
     
-        boomColorContain.removeAllChildren();
-        this.boomColorCount += this.spawnPrefab(boomColorPrefab, boomColorContain, count);
-    }
+    //     boomColorContain.removeAllChildren();
+    //     this.boomColorCount += this.spawnPrefab(boomColorPrefab, boomColorContain, count);
+    // }
 
  
     public getRandomColor(): Color {
