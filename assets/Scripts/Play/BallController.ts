@@ -34,7 +34,7 @@ export class BallController extends Component {
         this.jump = true;
         this.audioControl.onAudioArray(6); 
     }
-    
+
     protected update(dt: number): void {
         if (this.jump) {
             this.speed.y -= 0.15; 

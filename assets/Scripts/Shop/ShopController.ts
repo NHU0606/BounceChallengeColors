@@ -31,7 +31,6 @@ export class ShopController extends Component {
     private newScore: number;
 
     protected async onLoad(): Promise<void> {
-        
         let parameters = find('GameClient');
         let gameClientParams = parameters.getComponent(StoreAPI);
         this.gameClient = gameClientParams.gameClient;
@@ -72,6 +71,12 @@ export class ShopController extends Component {
     protected async renderState(): Promise<void> {
         this.listItem.forEach((item, index) => {
             item.on(Node.EventType.TOUCH_START, async() => {
+                this.shopView.NoCostCloseBtn.interactable = true;
+                this.shopView.LockChooseBtn.interactable = true;
+                this.shopView.LockNoCostBtn.interactable = true;
+                this.shopView.ChooseCloseBtn.interactable = true;
+                this.shopView.ChooseBtn.interactable = true;
+                this.shopView.CloseMainBtn.interactable = true;
                 if ( this.state[index] === 0 ) {
                     this.shop.StoreModel = index;
                     this.shopView.ChooseItemSprite.spriteFrame = this.shopModel.ItemTypeFrame[index];

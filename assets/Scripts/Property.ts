@@ -259,7 +259,6 @@ export class Property extends Component {
     @property({ type: Button })
     private replayBtn: Button;
 
-    
     public get ReplayBtn() : Button {
         return this.replayBtn;
     }

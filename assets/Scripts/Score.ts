@@ -31,21 +31,8 @@ export class Score extends Component {
     }
 
     public updateScore(num: number): void {
-        // try {
-            this.currentScore = num;
-            this.scoreLabel.string = String(this.currentScore);
-
-        //     let maxScore = parseInt(localStorage.getItem(Data.highscore));
-
-        //     if ( maxScore < num ) {
-        //         localStorage.setItem(Data.highscore, num.toString());
-        //     } else {
-        //         if ( Data.highScoreStatic < num ) Data.highScoreStatic = num;
-        //     }
-        // }
-        // catch (error) {
-        //     if (Data.highScoreStatic < num) Data.highScoreStatic = num;
-        // }
+        this.currentScore = num;
+        this.scoreLabel.string = String(this.currentScore);
     }
 
     public addScore(): void {

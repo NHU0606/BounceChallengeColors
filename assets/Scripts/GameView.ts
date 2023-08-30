@@ -132,6 +132,7 @@ export class GameView extends Component {
 
     private onClickHomePause(): void {
         this.interactableBtnPause();
+        this.audioControl.onAudioArray(5);
         director.loadScene(SCENE_NAME.Entry);
     }
 

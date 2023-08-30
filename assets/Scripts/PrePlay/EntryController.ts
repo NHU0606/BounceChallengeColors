@@ -1,15 +1,10 @@
 import { StoreAPI } from './../StoreAPI';
 import {
   _decorator,
-  AudioClip,
-  AudioSource,
   Button,
   Component,
   director,
-  error,
   find,
-  Node,
-  sys,
 } from "cc";
 import { Data, SCENE_NAME } from "../Data";
 import { AudioController } from "../AudioController";
