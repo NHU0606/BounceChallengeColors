@@ -131,4 +131,3 @@ export class AudioController extends Component {
     this.iconToHide.node.active = !this.isIconShown;
   }
 }
-
