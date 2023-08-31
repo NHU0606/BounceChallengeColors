@@ -36,6 +36,7 @@ export class EntryController extends Component {
   }
 
   private async onClickBtnPlay(): Promise<void> {
+    this.audioControl.onAudioArray(5);
     this.playBtn.interactable = false;
     let _this = this;
     let parameters = find('GameClient');
@@ -48,7 +49,6 @@ export class EntryController extends Component {
 
     gameClientParams.gameId = _this.matchId;
     
-    this.audioControl.onAudioArray(5);
     director.loadScene(SCENE_NAME.Play);
   }
 }

@@ -397,6 +397,8 @@ public spawnBoomColor(count: number): void {
 }
 
   private async onClickReplay(): Promise<void> {
+    this.audioControl.onAudioArray(5);
+
     this.gameView.interactableBtnPause();
     let parameters = find("GameClient");
     let gameClientParams = parameters.getComponent(StoreAPI);
