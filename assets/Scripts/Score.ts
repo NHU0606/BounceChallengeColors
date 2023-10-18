@@ -1,5 +1,5 @@
-import { Data } from './Data';
 import { _decorator, Component, Label, LabelComponent, Node } from 'cc';
+import { Data, DataGame, DataUser } from './DataUser';
 const { ccclass, property } = _decorator;
 
 @ccclass('Score')
@@ -35,10 +35,17 @@ export class Score extends Component {
         this.scoreLabel.string = String(this.currentScore);
     }
 
+
     public addScore(): void {
         this.updateScore(this.currentScore + 1);
+
+        if ( this.currentScore > DataUser.dataUser.data.highscore ) {
+            DataUser.dataUser.data.highscore = this.currentScore;
+        }
     }
 
-    
+    public getScore(): number {
+        return this.currentScore;
+    }
 }
 

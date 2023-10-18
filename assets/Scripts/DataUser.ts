@@ -3,13 +3,8 @@ const { ccclass, property } = _decorator;
 
 @ccclass('Data')
 export class Data extends Component {
-    public static readonly highscore = 'highscoreBounceChallenge';
     public static readonly sound = 'soundBounceChanllenge';
-    
-    public static highScoreStatic: number = 0;
     public static soundStatic: number = 1;
-
-    public static readonly Node_GameClient = { GameClient: 'GameClient'}
 }
 
 export type DataGame = {
@@ -30,10 +25,4 @@ export class DataUser {
             costState: [0, 40, 80, 120, 160, 200, 240, 280, 320]
         }
     }
-}
-
-export const SCENE_NAME = {
-    Entry: 'Entry',
-    Play: 'Play',
-    Shop: 'Shop'
 }

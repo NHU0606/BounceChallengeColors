@@ -9,7 +9,6 @@ export class ShopModel extends Component {
    public get ItemTypeFrame() : SpriteFrame[] {
     return this.itemTypeFrame;
    }
-
    
    public set ItemTypeFrame(v : SpriteFrame[]) {
     this.itemTypeFrame = v;

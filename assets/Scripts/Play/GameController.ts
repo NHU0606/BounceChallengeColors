@@ -1,4 +1,4 @@
-import { StoreAPI } from "./../StoreAPI";
+import { StoreAPI } from "../GameCenter/StoreAPI";
 import {
   _decorator,
   Animation,
@@ -22,17 +22,18 @@ import {
 import { Score } from "../Score";
 import { Property } from "../Property";
 import { BallController } from "./BallController";
+import { GameCenterController } from "../GameCenter/GameCenterController";
 import { AudioController } from "../AudioController";
 import { GameView } from "../GameView";
 import { ShopValue } from "../ShopValue";
-import { DataUser, SCENE_NAME } from "../Data";
+import Constants from "../Data/Constants";
+import { DataUser } from "../DataUser";
 const { ccclass, property } = _decorator;
-let matchId: string;
 
 @ccclass("GameController")
 export class GameController extends Component {
-  private gameClient;
-  private userID: string;
+  @property({ type: GameCenterController})
+  private gameCenter: GameCenterController;
 
   @property({ type: Label })
   private highScore: Label;
@@ -67,41 +68,36 @@ export class GameController extends Component {
   private boomColorCount: number = 0;
 
   protected onLoad(): void {
-    let parameters = find("GameClient");
-    let gameClientParams = parameters.getComponent(StoreAPI);
-    this.gameClient = gameClientParams.gameClient;
-    matchId = gameClientParams.gameId;
-
-    this.userID = this.gameClient.user.citizen.getCitizenId();
-
-    setTimeout(() => {
-      this.gameView.startTopBottom();
-    }, 3000);
-
-    this.ball = this.property.BallNode.getComponent(BallController);
-
-    let collider = this.ball.getComponent(Collider2D);
-    if (collider) {
-      collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
-    }
-
-    for (let i = 0; i < 6; i++) {
-      this.laneObstacle[i] = [];
-    }
-
     if (find("Shop") === null) {
       this.shop = 0;
     } else {
       this.shop = find("Shop").getComponent(ShopValue).StoreModel;
     }
-
-    this.property.BallSprite.spriteFrame =
-      this.property.BallSpriteFrame[this.shop];
   }
 
   protected start(): void {
-    this.animContain = this.property.AnimContain.getComponent(Animation);
-    this.animStar = this.property.AnimTouchStar.getComponent(Animation);
+    this.gameCenter.startMatch(() => {
+
+      this.animContain = this.property.AnimContain.getComponent(Animation);
+      this.animStar = this.property.AnimTouchStar.getComponent(Animation);
+
+      setTimeout(() => {
+        this.gameView.startTopBottom();
+      }, 3000);
+
+      this.ball = this.property.BallNode.getComponent(BallController);
+
+      let collider = this.ball.getComponent(Collider2D);
+      if (collider) {
+        collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+      }
+
+      for (let i = 0; i < 6; i++) {
+        this.laneObstacle[i] = [];
+      }
+
+      this.property.BallSprite.spriteFrame = this.property.BallSpriteFrame[this.shop];
+    })
   }
 
   protected update(dt: number): void {
@@ -250,7 +246,6 @@ export class GameController extends Component {
       this.applyColorToObstacles(this.property.RightContain, leftLine.color);
     }
     if (this.score.heart <= 0) this.gameOver();
-    if (this.score.currentScore === 99) this.gameWin();
   }
 
   private applyColorToObstacles(container: Node, color: Color): void {
@@ -396,25 +391,17 @@ public spawnBoomColor(count: number): void {
     this.boomColorCount += this.spawnPrefab(boomColorPrefab, boomColorContain, count);
 }
 
-  private async onClickReplay(): Promise<void> {
+  private onClickReplay():void {
     this.audioControl.onAudioArray(5);
-
     this.gameView.interactableBtnPause();
-    let parameters = find("GameClient");
-    let gameClientParams = parameters.getComponent(StoreAPI);
-    this.gameClient = gameClientParams.gameClient;
 
-    await gameClientParams.gameClient.match
-      .startMatch()
-      .then((data) => {
-        matchId = data.matchId;
-      })
-      .catch((error) => console.log(error));
-    gameClientParams.gameId = matchId;
-    director.loadScene(SCENE_NAME.Play);
+    director.loadScene(Constants.SCENE_NAME.Play);
   }
 
   private gameOver(): void {
+    this.gameCenter.completeMatch(() => {
+    }, {score: this.score.getScore()});
+
     input.off(Input.EventType.TOUCH_START);
     this.property.AnimContain.active = false;
     this.property.AnimTouchStar.active = false;
@@ -437,67 +424,10 @@ public spawnBoomColor(count: number): void {
     }, 2000);
   }
 
-  private gameWin(): void {
-    input.off(Input.EventType.TOUCH_START);
-    this.property.AnimContain.active = false;
-    this.property.AnimTouchStar.active = false;
-    this.property.LeftContain.active = false;
-    this.property.RightContain.active = false;
-    this.gameView.overTopBottom();
-    this.property.GameNode.active = false;
-    this.property.PauseContain.active = false;
-    this.property.NontifiWin.active = true;
-    this.property.BallNode.position = new Vec3(0, 50, 0);
-
-    this.gameView.updateStars();
-    setTimeout(() => {
-      this.property.ShopBtn.node.active = true;
-      this.property.ContainImgSoundContain.active = true;
-      this.property.GameNodeFake.active = false;
-      this.property.NontifiWin.active = false;
-      this.property.OverNode.active = true;
-      this.showScoreWin();
-    }, 2000);
-  }
-
-  private async showScoreWin(): Promise<void> {
-    if (this.score.currentScore > DataUser.dataUser.data.highscore) {
-      DataUser.dataUser.data.highscore = this.score.currentScore;
-    }
-
+  private showScoreResult(): void {
     DataUser.dataUser.data.cost += this.score.currentScore;
-
-    await this.gameClient.user.data
-      .setGameData({ [this.userID]: DataUser.dataUser }, false)
-      .then((response: any) => {});
-
-    let score = this.score.currentScore + 1;
-    this.urScore.string = score.toString();
-    this.highScore.string = DataUser.dataUser.data.highscore.toString();
-
-    await this.gameClient.match
-      .completeMatch(matchId, { score: this.score.currentScore + 1 })
-      .then((data) => {})
-      .catch((error) => console.log("sent not complete"));
-  }
-
-  private async showScoreResult(): Promise<void> {
-    if (this.score.currentScore > DataUser.dataUser.data.highscore) {
-      DataUser.dataUser.data.highscore = this.score.currentScore;
-    }
-
-    DataUser.dataUser.data.cost += this.score.currentScore;
-
-    await this.gameClient.user.data
-      .setGameData({ [this.userID]: DataUser.dataUser }, false)
-      .then((response: any) => {});
 
     this.urScore.string = this.score.currentScore.toString();
     this.highScore.string = DataUser.dataUser.data.highscore.toString();
-
-    await this.gameClient.match
-      .completeMatch(matchId, { score: this.score.currentScore })
-      .then((data) => {})
-      .catch((error) => console.log("sent not complete"));
   }
 }

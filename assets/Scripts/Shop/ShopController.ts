@@ -1,12 +1,12 @@
-import { StoreAPI } from './../StoreAPI';
+import { StoreAPI } from '../GameCenter/StoreAPI';
 import { _decorator, Component, director, error, find, instantiate, Label, Node, Sprite, UITransform, Vec3 } from 'cc';
 import { ShopView } from './ShopView';
 import { ShopModel } from './ShopModel';
 import { AudioController } from "../AudioController";
 import { ShopValue } from '../ShopValue';
-import { DataUser, SCENE_NAME } from '../Data';
+import { Data, DataUser } from '../DataUser';
+import Constants from '../Data/Constants';
 const { ccclass, property } = _decorator;
-let matchId: string;
 
 @ccclass('ShopController')
 export class ShopController extends Component {
@@ -20,6 +20,7 @@ export class ShopController extends Component {
     private shopModel: ShopModel;
 
     private shop: ShopValue;
+
     private gameClient;
     private userID: string;
 
@@ -36,6 +37,11 @@ export class ShopController extends Component {
         this.gameClient = gameClientParams.gameClient;
         this.userID = this.gameClient.user.citizen.getCitizenId();
         
+        this.cost = DataUser.dataUser.data.costState;
+        this.state = DataUser.dataUser.data.state;
+        this.scoreShop = DataUser.dataUser.data.cost;
+        this.shopView.CostLabel.string = DataUser.dataUser.data.cost.toString();
+
         if ( find('Shop') === null) {
             const shopBallType = new Node('Shop');
             director.addPersistRootNode(shopBallType);
@@ -44,14 +50,6 @@ export class ShopController extends Component {
             this.shop = find('Shop').getComponent(ShopValue);
         }
         
-        await this.gameClient.user.data.getGameData().then((response) => {
-            this.shopView.CostLabel.string = DataUser.dataUser.data.cost.toString();
-            this.cost = DataUser.dataUser.data.costState;
-        })
-        .catch(async (e) => {
-            console.log(e);
-        })
-
         for ( let i = 0; i < 9; i++) {
             const itemBallNode = instantiate(this.shopView.ItemBallPrefab);
             const labelcost = itemBallNode.getChildByName('Label').getComponent(Label);
@@ -83,13 +81,6 @@ export class ShopController extends Component {
                     this.shopView.ChooseItem.getComponent(UITransform).setContentSize(120, 120);
                     this.shopView.ChooseNode.active = true;
                 } else {
-                    await this.gameClient.user.data.getGameData().then((response) => {
-                        this.scoreShop = DataUser.dataUser.data.cost;
-                    })
-                    .catch(async (e) => {
-                        console.log(e);
-                    })
-
                     if ( this.scoreShop >= this.cost[index] ) {
                         this.newScore = this.scoreShop - this.cost[index];
                         this.shopView.CostLabel.string = this.newScore.toString();
@@ -99,11 +90,12 @@ export class ShopController extends Component {
 
                         item.getChildByName('Label').getComponent(Label).string = this.cost[index].toString();
                     
+                        DataUser.dataUser.data.cost = this.scoreShop;
+                        DataUser.dataUser.data.costState = this.cost;
+                        DataUser.dataUser.data.state = this.state;
+                        
                         await this.gameClient.user.data.setGameData( {[this.userID]: DataUser.dataUser}, false)
                             .then((response: any) => {
-                                DataUser.dataUser.data.cost = this.newScore;
-                                DataUser.dataUser.data.costState = this.cost;
-                                DataUser.dataUser.data.state = this.state;
                             });
 
                         this.shop.StoreModel = index;
@@ -138,12 +130,14 @@ export class ShopController extends Component {
         this.gameClient = gameClientParams.gameClient;
 
         await gameClientParams.gameClient.match.startMatch()
-            .then((data) => {matchId = data.matchId})
-            .catch((error) => console.log(error))
-        gameClientParams.gameId = matchId;
+            .then((data) => {
+                gameClientParams.matchData = data;
+            })
+            .catch((error) => console.log(error));
+
         this.shopView.ChooseCloseBtn.interactable = false;
         this.shopView.ChooseBtn.interactable = false;
-        director.loadScene(SCENE_NAME.Play);
+        director.loadScene(Constants.SCENE_NAME.Play);
     }
 
     private async onClickCloseMainBtn(): Promise<void> {
@@ -153,11 +147,14 @@ export class ShopController extends Component {
         let parameters = find('GameClient');
         let gameClientParams = parameters.getComponent(StoreAPI);
         this.gameClient = gameClientParams.gameClient;
+
         await gameClientParams.gameClient.match.startMatch()
-            .then((data) => {matchId = data.matchId})
-            .catch((error) => console.log(error))
-        gameClientParams.gameId = matchId;
-        director.loadScene(SCENE_NAME.Play);
+        .then((data) => {
+            gameClientParams.matchData = data;
+        })
+        .catch((error) => console.log(error));
+
+        director.loadScene(Constants.SCENE_NAME.Play);
     }
 
     private interacBtnShop(): void {

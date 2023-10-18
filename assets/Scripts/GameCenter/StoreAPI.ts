@@ -4,7 +4,5 @@ const { ccclass, property } = _decorator;
 @ccclass('StoreAPI')
 export class StoreAPI extends Component {
     public gameClient;
-    public gameId: string;
+    public matchData;
 }
-
-

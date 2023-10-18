@@ -1,5 +1,5 @@
 import { _decorator, AudioClip, AudioSource, Component, Node, Sprite, sys } from 'cc';
-import { Data } from './Data';
+import { Data } from './DataUser';
 const { ccclass, property } = _decorator;
 
 @ccclass('AudioController')

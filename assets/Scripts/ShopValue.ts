@@ -7,10 +7,10 @@ export class ShopValue extends Component {
     private storeModel: number = 0;
 
     public get StoreModel(): number {
-    return this.storeModel;
+        return this.storeModel;
     }
     public set StoreModel(value: number) {
-    this.storeModel = value;
+        this.storeModel = value;
     }
 }
 

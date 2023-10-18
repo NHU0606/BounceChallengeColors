@@ -2,7 +2,8 @@ import { Property } from './Property';
 import { _decorator, Color, Component, director, instantiate, Label, Node, Prefab, Sprite, SpriteFrame, tween, UIOpacity, Vec3 } from 'cc';
 import { Score } from './Score';
 import { AudioController } from "./AudioController";
-import { Data, DataUser, SCENE_NAME } from './Data';
+import { Data, DataUser } from './DataUser';
+import Constants from './Data/Constants';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameView')
@@ -133,7 +134,7 @@ export class GameView extends Component {
     private onClickHomePause(): void {
         this.interactableBtnPause();
         this.audioControl.onAudioArray(5);
-        director.loadScene(SCENE_NAME.Entry);
+        director.loadScene(Constants.SCENE_NAME.Entry);
     }
 
     public interactableBtnPause(): void {
@@ -150,7 +151,7 @@ export class GameView extends Component {
 
     private onClickShopBtn(): void {
         this.audioControl.onAudioArray(5);
-        director.loadScene(SCENE_NAME.Shop);
+        director.loadScene(Constants.SCENE_NAME.Shop);
     }
 
     //----------------SPAWN PREFAB------------------------
