@@ -17,10 +17,6 @@ export class GameView extends Component {
     @property({ type: Score})
     private score: Score;
 
-    // public starPointCount: number = 0;
-    // public boomCount: number = 0;
-    // public boomColorCount: number = 0;
-
     @property({ type: [Node] }) 
     private starEnd: Node[] = [];
 
@@ -80,10 +76,10 @@ export class GameView extends Component {
         const bottomContain = this.property.BottomContain;
 
         const startPosTop = new Vec3(0, 550, 0);
-        const endPosTop = new Vec3(0, 370, 0);
+        const endPosTop = new Vec3(0, 400, 0);
 
         const startPosBottom = new Vec3(0, -550, 0);
-        const endPosBottom = new Vec3(0, -370, 0);
+        const endPosBottom = new Vec3(0, -400, 0);
 
         this.moveTween(topContain, startPosTop, endPosTop, 0.5);
         this.moveTween(bottomContain, startPosBottom, endPosBottom, 0.5);
@@ -94,10 +90,10 @@ export class GameView extends Component {
         const bottomContain = this.property.BottomContain; 
 
         const startPosTop = new Vec3(0, 550, 0);
-        const endPosTop = new Vec3(0, 370, 0);
+        const endPosTop = new Vec3(0, 400, 0);
 
         const startPosBottom = new Vec3(0, -550, 0);
-        const endPosBottom = new Vec3(0, -370, 0);
+        const endPosBottom = new Vec3(0, -400, 0);
 
         this.moveTween(topContain, endPosTop, startPosTop, 0.5);
         this.moveTween(bottomContain, endPosBottom, startPosBottom, 0.5);
@@ -115,6 +111,8 @@ export class GameView extends Component {
         this.property.ContainImgSoundContain.active = true;
         this.property.TopContain.active = false;
         this.property.BottomContain.active = false;
+        this.property.GameNodeFake.active = false;
+        this.property.GameNode.active = false;
     }
 
     private onClickContinuePause(): void {
@@ -129,6 +127,8 @@ export class GameView extends Component {
         this.property.GameNode.active = true;
         this.property.TopContain.active = true;
         this.property.BottomContain.active = true;
+        this.property.GameNodeFake.active = true;
+        this.property.GameNode.active = true;
     }
 
     private onClickHomePause(): void {
@@ -154,62 +154,19 @@ export class GameView extends Component {
         director.loadScene(Constants.SCENE_NAME.Shop);
     }
 
-    //----------------SPAWN PREFAB------------------------
-
-    // private spawnPrefab(prefab: Prefab, container: Node, count: number) {
-    //     container.removeAllChildren();
-    
-    //     for (let i = 0; i < count; i++) {
-    //         const objectInstance = instantiate(prefab);
-    
-    //         const maxX = container.width / 2;
-    //         const maxY = container.height / 2;
-    //         const randomX = Math.random() * (maxX * 2) - maxX;
-    //         const randomY = Math.random() * (maxY * 2) - maxY;
-    
-    //         objectInstance.setPosition(randomX, randomY, 0);
-    //         objectInstance.active = true;
-    //         container.addChild(objectInstance);
-    //     }
-    //     return count;
-    // }
-
-    // public spawnStarPoint(count: number): void {
-    //     const starPrefab = this.property.StarPoint;
-    //     const starContain = this.property.StarPointContain;
-    
-    //     starContain.removeAllChildren();
-    //     this.starPointCount += this.spawnPrefab(starPrefab, starContain, count);
-    // }
-    
-    // public spawnBoom(count: number): void {
-    //     const boomPrefab = this.property.BoomPrefab;
-    //     const boomContain = this.property.BoomContain;
-    
-    //     boomContain.removeAllChildren();
-    //     this.boomCount += this.spawnPrefab(boomPrefab, boomContain, count);
-    // }
-
-    // public spawnBoomColor(count: number): void {
-    //     const boomColorPrefab = this.property.BoomColorPrefab;
-    //     const boomColorContain = this.property.BoomColorContain;
-    
-    //     boomColorContain.removeAllChildren();
-    //     this.boomColorCount += this.spawnPrefab(boomColorPrefab, boomColorContain, count);
-    // }
-
- 
     public getRandomColor(): Color {
         const colors = [
-            new Color(255,183,183),  
             new Color(228,228,208),   
             new Color(168,223,142), 
-            new Color(240,184,110), 
             new Color(173,196,206), 
             new Color(161,204,209), 
             new Color(182,234,218), 
             new Color(160,196,157), 
             new Color(150,182,197), 
+            new Color(198,131,215), 
+            new Color(124,147,195), 
+            new Color(45,149,150), 
+            new Color(45,149,150), 
         ];
     
         const randomIndex = Math.floor(Math.random() * colors.length);

@@ -12,7 +12,9 @@ export type DataGame = {
         highscore: number,
         cost: number,
         state: number[],
-        costState: number[]
+        // costList: number[],
+        costState: number[],
+        checkLog: Object
     }
 }
 
@@ -22,7 +24,9 @@ export class DataUser {
             highscore: 0,
             cost: 0,
             state: [0, 1, 1, 1, 1, 1, 1, 1, 1],
-            costState: [0, 40, 80, 120, 160, 200, 240, 280, 320]
+            // costList: [0, 10, 25, 45, 70, 100, 135, 175, 215],
+            costState: [0, 40, 80, 120, 160, 200, 240, 280, 320],
+            checkLog: {}
         }
     }
 }

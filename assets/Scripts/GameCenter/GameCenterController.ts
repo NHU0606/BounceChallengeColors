@@ -1,5 +1,5 @@
 import { _decorator, Component, director, find, Node } from 'cc';
-import GameClient from '@onechaintech/gamesdk-beta'
+import GameClient from '@onechaintech/gamesdk-dev'
 import { StoreAPI } from './StoreAPI';
 import Constants from '../Data/Constants';
 import { DataGame, DataUser } from '../DataUser';
@@ -48,9 +48,24 @@ export class GameCenterController extends Component {
         this.gameClient.match.startMatch().then((data) => {
             gameClientParams.matchData = data;
 
+            
+            if (!DataUser.dataUser.data.checkLog) DataUser.dataUser.data.checkLog = {};
+            DataUser.dataUser.data.checkLog[data.matchId] = [];
+
             // Apply callback
             callBack.apply(callBack);
         }).catch((error) => console.log('Error at start match: ', error));
+    }
+
+    public setGameData(logGame: { score: number, seconds: number, datetime: string }): void {
+        let parameters = find(Constants.NODE_NAME.GameClient);
+        let gameClientParams = parameters.getComponent(StoreAPI);
+
+        this.gameClient = gameClientParams.gameClient;
+        let userID = this.gameClient.user.citizen.getCitizenId();
+        let matchId = gameClientParams.matchData.matchId
+
+        DataUser.dataUser.data.checkLog[`${matchId}`].push(logGame);
     }
 
     /** 

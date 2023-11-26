@@ -28,23 +28,25 @@ export class EntryController extends Component {
   @property({ type: Button })
   private okBtn: Button;
 
+  @property({ type: Button })
+  private ruleBtn: Button;
+
   protected onLoad(): void {
     this.playBtn.interactable = true;
-  }
-
-  protected start(): void {
-      this.ruleNode.active = false;
   }
 
   private onClickBtnPlay():void {
     this.audioControl.onAudioArray(5);
     this.playBtn.interactable = false;
-
-    this.ruleNode.active = true;
+    this.animLoad.active = true;
+    director.loadScene(Constants.SCENE_NAME.Play);
   }
 
   private onClickOkBtn(): void {
-    this.animLoad.active = true;
-    director.loadScene(Constants.SCENE_NAME.Play);
+    this.ruleNode.active = false;
+  }
+
+  private onClickRuleBtn(): void {
+    this.ruleNode.active = true;
   }
 }

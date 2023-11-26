@@ -2221,8 +2221,8 @@
     "_string": "",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40,
-    "_fontSize": 40,
+    "_actualFontSize": 35,
+    "_fontSize": 35,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
     "_overflow": 0,
@@ -2509,7 +2509,7 @@
     "_enabled": true,
     "__prefab": null,
     "clickEvents": [],
-    "_interactable": true,
+    "_interactable": false,
     "_transition": 0,
     "_normalColor": {
       "__type__": "cc.Color",
@@ -3307,7 +3307,7 @@
     "_enabled": true,
     "__prefab": null,
     "clickEvents": [],
-    "_interactable": true,
+    "_interactable": false,
     "_transition": 0,
     "_normalColor": {
       "__type__": "cc.Color",
@@ -3337,7 +3337,10 @@
       "b": 124,
       "a": 255
     },
-    "_normalSprite": null,
+    "_normalSprite": {
+      "__uuid__": "45872412-07ea-4a12-bf26-935236c445ef@f9941",
+      "__expectedType__": "cc.SpriteFrame"
+    },
     "_hoverSprite": null,
     "_pressedSprite": null,
     "_disabledSprite": null,
@@ -3714,7 +3717,7 @@
       "b": 98,
       "a": 255
     },
-    "_string": "You don't have \nenough Cakes",
+    "_string": "You don't have \nenough Score",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 30,

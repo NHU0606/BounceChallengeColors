@@ -36,12 +36,68 @@ export class Property extends Component {
     @property({ type: Node })
     private gameNodeFake: Node;
 
+    @property({ type: Node })
+    private rightWall: Node;
+
+    @property({ type: Node })
+    private leftWall: Node;
+
+    public get LeftWall() : Node {
+        return this.leftWall;
+    }
+
+    public get RightWall() : Node {
+        return this.rightWall;
+    }
+
     public get GameNodeFake() : Node {
         return this.gameNodeFake;
     }
 
     @property({ type: Prefab })
     private obstaclePrefabLeft: Prefab;
+
+    @property({ type: Prefab })
+    private boosterClosePrefab: Prefab;
+
+    @property({ type: Prefab })
+    private boosterOpenPrefab: Prefab;
+
+    @property({ type: Node })
+    private boosterCloseContain: Node;
+
+    @property({ type: Node })
+    private boosterOpenContain: Node;
+
+    public get BoosterCloseContain() : Node {
+        return this.boosterCloseContain;
+    }
+
+    public get BoosterOpenContain() : Node {
+        return this.boosterOpenContain;
+    }
+
+    public get BoosterClosePrefab() : Prefab {
+        return this.boosterClosePrefab;
+    }
+
+    public get BoosterOpenPrefab() : Prefab {
+        return this.boosterOpenPrefab;
+    }
+
+    @property({ type: Prefab })
+    private heartPrefab: Prefab;
+
+    @property({ type: Node })
+    private heartPrefabContain: Node;
+
+    public get HeartPrefabContain() : Node {
+        return this.heartPrefabContain;
+    }
+    
+    public get HeartPrefab() : Prefab {
+        return this.heartPrefab;
+    }
 
     public get ObstaclePrefabLeft(): Prefab {
         return this.obstaclePrefabLeft;

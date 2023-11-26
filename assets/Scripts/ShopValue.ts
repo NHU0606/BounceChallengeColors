@@ -3,14 +3,18 @@ const { ccclass, property } = _decorator;
 
 @ccclass('ShopValue')
 export class ShopValue extends Component {
-    @property({ type: CCInteger })
-    private storeModel: number = 0;
+    @property({
+        type: CCInteger,
+      })
 
-    public get StoreModel(): number {
-        return this.storeModel;
+    private storeBall: number = 0;
+    StoreModel: number;
+    public get StoreBall(): number {
+        return this.storeBall;
     }
-    public set StoreModel(value: number) {
-        this.storeModel = value;
+    public set StoreBall(value: number) {
+        this.storeBall = value;
     }
 }
 
+// ok

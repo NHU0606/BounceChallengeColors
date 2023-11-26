@@ -21,7 +21,7 @@ export class BallController extends Component {
     
     protected onLoad(): void {
         this.score.node.active = false;
-        this.speed.x = 0.8; 
+        this.speed.x = 3; 
         this.node.position = new Vec3(0, 50, 0);
         setTimeout(() => {
             input.on(Input.EventType.TOUCH_START, this.onTouchStart, this);
@@ -30,29 +30,32 @@ export class BallController extends Component {
     }
 
     private onTouchStart(event: EventTouch): void {
-        this.speed.y = 4; 
+        this.speed.y = 5; 
         this.jump = true;
         this.audioControl.onAudioArray(6); 
     }
 
     protected update(dt: number): void {
         if (this.jump) {
-            this.speed.y -= 0.15; 
+            this.speed.y -= 0.2; 
             this.node.position = this.node.position.add(this.speed);
-            this.changeDirection();
         }
     }
 
-    private changeDirection(): void {
-        if (this.node.position.x >= 220) {
-            this.score.addScore();
-            this.right = true;
-            this.speed.x = -1;
-        } else if (this.node.position.x <= -220) {
-            this.score.addScore();
-            this.right = false;
-            this.speed.x = 1;
-        }
+    public touchLeftWall(): void {
+        this.score.addScore();
+        this.right = false;
+        this.speed.x = 3;
+
+        this.node.position = this.node.position.add(this.speed);
+
+    }
+
+    public touchRightWall(): void {
+        this.score.addScore();
+        this.right = true;
+        this.speed.x = -3;
+
         this.node.position = this.node.position.add(this.speed);
     }
 }

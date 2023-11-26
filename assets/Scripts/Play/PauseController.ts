@@ -24,7 +24,5 @@ export class PauseController extends Component {
         this.pauseBtn.active = true;
         this.pauseInfo.active = false;
     }
-
-    
 }
 

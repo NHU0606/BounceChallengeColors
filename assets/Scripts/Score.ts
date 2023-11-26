@@ -22,6 +22,14 @@ export class Score extends Component {
         this.updateHeart(this.heart - 1);
     }
 
+    public plusHeart(): void {
+        if ( this.heart >= 3 ) return;
+
+        if ( this.heart < 3 ) {
+            this.updateHeart(this.heart + 1);
+        } 
+    }
+
     public minus3Heart(): void {
         this.updateHeart(this.heart - 3);
     }

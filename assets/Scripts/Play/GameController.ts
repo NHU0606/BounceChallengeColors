@@ -16,7 +16,9 @@ import {
   Node,
   Prefab,
   Sprite,
+  Tween,
   tween,
+  UITransform,
   Vec3,
 } from "cc";
 import { Score } from "../Score";
@@ -32,7 +34,7 @@ const { ccclass, property } = _decorator;
 
 @ccclass("GameController")
 export class GameController extends Component {
-  @property({ type: GameCenterController})
+  @property({ type: GameCenterController })
   private gameCenter: GameCenterController;
 
   @property({ type: Label })
@@ -55,7 +57,7 @@ export class GameController extends Component {
 
   private countObstacle: number = 0;
   private ball: BallController;
-  private shop: number;
+  private shop: number = 0;
 
   private animContain: Animation | null = null;
   private animStar: Animation | null = null;
@@ -65,18 +67,34 @@ export class GameController extends Component {
   private countTouch: number = 0;
   private starPointCount: number = 0;
   private boomCount: number = 0;
+  private heartCount: number = 0;
+  private boosterCloseCount: number = 0;
+  private boosterOpenCount: number = 0;
   private boomColorCount: number = 0;
+  private intervalChecklog;
+  private timeCheckLog: number = 0;
+  private touchWal: boolean = false;
 
   protected onLoad(): void {
-    if (find("Shop") === null) {
-      this.shop = 0;
-    } else {
+    this.intervalChecklog = setInterval(() => {
+      this.timeCheckLog++;
+    }, 1000)
+
+    if (find("Shop") != null) {
       this.shop = find("Shop").getComponent(ShopValue).StoreModel;
+      if (this.shop === undefined) this.shop = 0;
     }
+    this.property.BallSprite.spriteFrame = this.property.BallSpriteFrame[this.shop];
   }
 
   protected start(): void {
     this.gameCenter.startMatch(() => {
+      this.property.GameNodeFake.active = true;
+      this.property.GameNode.active = true;
+
+      this.schedule(() => {
+        this.randomizeAndMove();
+      }, 3)
 
       this.animContain = this.property.AnimContain.getComponent(Animation);
       this.animStar = this.property.AnimTouchStar.getComponent(Animation);
@@ -95,13 +113,96 @@ export class GameController extends Component {
       for (let i = 0; i < 6; i++) {
         this.laneObstacle[i] = [];
       }
-
-      this.property.BallSprite.spriteFrame = this.property.BallSpriteFrame[this.shop];
     })
   }
 
   protected update(dt: number): void {
     this.changeDirectionBall();
+  }
+
+  private getRandomFunction(): Function {
+    const functions = [
+      // this.moveCloseWallRightLeft,
+      // this.moveCloseWallRight,
+      // this.moveCloseWallLeft,
+      this.moveCloseTopBot,
+      this.moveCloseBot,
+      this.moveCloseTop
+    ];
+
+    const randomIndex = Math.floor(Math.random() * functions.length);
+    return functions[randomIndex];
+  }
+
+  private randomizeAndMove(): void {
+    const randomFunction = this.getRandomFunction();
+
+    setTimeout(() => {
+      randomFunction.call(this);
+      setTimeout(() => {
+        this.moveTopDown(400, -400);
+      }, 5000);
+    }, 4000);
+  }
+
+  // tween move wall right + left
+
+  private moveWall(positionLeft: number, positionRight: number): void {
+    const tweenWall = (wall: Node, position: Vec3): Tween<Node> =>
+      tween(wall)
+        .call(() => (wall.active = true))
+        .to(0.3, { position })
+        .start();
+
+    tweenWall(this.property?.LeftWall, new Vec3(positionLeft, 0, 0));
+    tweenWall(this.property?.RightWall, new Vec3(positionRight, 0, 0));
+  }
+
+  private moveCloseWallRightLeft(): void {
+    if (this.property?.LeftWall.position.x >= -50) return;
+    if (this.property?.RightWall.position.x <= 50) return;
+
+    this.moveWall(this.property?.LeftWall.position.x + 30, this.property?.RightWall.position.x - 30);
+  }
+
+  private moveFarWallRightLeft(): void {
+    if (this.property?.LeftWall.position.x <= -270) return;
+    if (this.property?.RightWall.position.x >= 270) return;
+
+    this.moveWall(this.property?.LeftWall.position.x - 30, this.property?.RightWall.position.x + 30);
+  }
+
+  // private moveCloseWallRight(): void {
+  //   this.moveWall(-270, 220);
+  // }
+
+  // private moveCloseWallLeft(): void {
+  //   this.moveWall(-220, 270);
+  // }
+
+  // tween move wall top + right
+
+  private moveTopDown(posTop: number, posBot: number): void {
+    const tweenWall = (wall: Node, position: Vec3): Tween<Node> =>
+      tween(wall)
+        .call(() => (wall.active = true))
+        .to(0.3, { position })
+        .start();
+
+    tweenWall(this.property?.BottomContain, new Vec3(0, posBot, 0))
+    tweenWall(this.property?.TopContain, new Vec3(0, posTop, 0))
+  }
+
+  private moveCloseTopBot(): void {
+    this.moveTopDown(380, -380);
+  }
+
+  private moveCloseTop(): void {
+    this.moveTopDown(380, -400);
+  }
+
+  private moveCloseBot(): void {
+    this.moveTopDown(400, -380);
   }
 
   private onBeginContact(
@@ -111,10 +212,12 @@ export class GameController extends Component {
     score: number
   ): void {
     const otherTag = otherCollider.tag;
-    if ( otherTag === 9 ) {
+    if (otherTag === 12) {
       this.countTouch++;
+      this.touchWal = true;
       this.audioControl.onAudioArray(4);
       this.animContain.play("BallBounce");
+      this.property.BallControl.touchRightWall();
       this.property.AnimContain.setPosition(
         this.property.BallNode.position.x,
         this.property.BallNode.position.y,
@@ -123,8 +226,10 @@ export class GameController extends Component {
       this.createObstacle("left", this.countObstacle, this.obstacleColor);
       this.property.LeftContain.active = true;
       this.property.RightContain.active = false;
-    } else if ( otherTag === 8) {
+    } else if (otherTag === 11) {
+      this.touchWal = true;
       this.countTouch++;
+      this.property.BallControl.touchLeftWall();
       this.audioControl.onAudioArray(4);
       this.animContain.play("BallBounce");
       this.property.AnimContain.setPosition(
@@ -158,21 +263,30 @@ export class GameController extends Component {
         0
       );
 
+      let logGame = {
+        seconds: this.timeCheckLog,
+        score: this.score.currentScore,
+        datetime: new Date().toLocaleString()
+      };
+
+      if (this.score.currentScore % 10 === 0) this.gameCenter.setGameData(logGame);
+
+
       const starts = this.property.StarPointContain.children;
       for (let i = 0; i < starts.length; i++) {
         if (starts[i] === otherCollider.node) {
-          if ( this.score.currentScore <= 80 && this.score.currentScore > 1) {
+          if (this.score.currentScore <= 80 && this.score.currentScore > 1) {
             starts[i].active = false;
 
             setTimeout(() => {
-              starts[i].active = true;
               setTimeout(() => {
                 this.spawnStarPoint(1);
               }, 100)
+              starts[i].active = true;
             }, 400);
           }
 
-          if ( this.score.currentScore > 80 ) {
+          if (this.score.currentScore > 80) {
             starts[i].active = false;
           }
         }
@@ -193,15 +307,16 @@ export class GameController extends Component {
           booms[i].active = false;
 
           setTimeout(() => {
-            booms[i].active = true;
             setTimeout(() => {
-              this.spawnBoom(2);
+              this.spawnBoom(1);
             }, 500);
+            booms[i].active = true;
           }, 6500);
         }
       }
     } else if (otherTag === 6) {
-      this.audioControl.onAudioArray(1);
+      this.audioControl.onAudioArray(3);
+
       const newColor = this.gameView.getRandomColor();
       const leftLine = this.property.LeftLine.getComponent(Sprite);
       const leftFakeLine = this.property.LeftFakeLine.getComponent(Sprite);
@@ -209,14 +324,12 @@ export class GameController extends Component {
       const rightFakeLine = this.property.RightFakeLine.getComponent(Sprite);
       const topLine = this.property.TopContain.getComponent(Sprite);
       const bottomLine = this.property.BottomContain.getComponent(Sprite);
-      const scoreLabel = this.score.scoreLabel.getComponent(Label);
       if (
         leftLine ||
         rightLine ||
         topLine ||
         leftFakeLine ||
-        rightFakeLine ||
-        scoreLabel
+        rightFakeLine
       ) {
         leftLine.color = newColor;
         leftFakeLine.color = leftLine.color;
@@ -224,7 +337,6 @@ export class GameController extends Component {
         rightFakeLine.color = leftLine.color;
         topLine.color = leftLine.color;
         bottomLine.color = leftLine.color;
-        scoreLabel.color = leftLine.color;
       }
 
       const boomsColor = this.property.BoomColorContain.children;
@@ -233,10 +345,10 @@ export class GameController extends Component {
           boomsColor[i].active = false;
 
           setTimeout(() => {
-            boomsColor[i].active = true;
             setTimeout(() => {
               this.spawnBoomColor(1);
             }, 500)
+            boomsColor[i].active = true;
           }, 6500);
         }
       }
@@ -244,7 +356,59 @@ export class GameController extends Component {
       this.obstacleColor = leftLine.color;
       this.applyColorToObstacles(this.property.LeftContain, leftLine.color);
       this.applyColorToObstacles(this.property.RightContain, leftLine.color);
+    } else if (otherTag === 10) {
+      this.audioControl.onAudioArray(3);
+      this.score.plusHeart();
+
+      const hearts = this.property.HeartPrefabContain.children;
+      for (let i = 0; i < hearts.length; i++) {
+        if (hearts[i] === otherCollider.node) {
+          hearts[i].active = false;
+
+          setTimeout(() => {
+            setTimeout(() => {
+              this.spawnHeart(1);
+            }, 500);
+            hearts[i].active = true;
+          }, 6000);
+        }
+      }
+    } else if (otherTag === 14) {
+      this.audioControl.onAudioArray(3);
+
+      this.moveCloseWallRightLeft();
+      const boosterClose = this.property.BoosterCloseContain.children;
+      for (let i = 0; i < boosterClose.length; i++) {
+        if (boosterClose[i] === otherCollider.node) {
+          boosterClose[i].active = false;
+
+          setTimeout(() => {
+            // setTimeout(() => {
+            // }, 2500);
+            // boosterClose[i].active = true;
+            this.spawnBoosterClose(1);
+          }, 2000);
+        }
+      }
+    } else if (otherTag === 15) {
+      this.audioControl.onAudioArray(3);
+
+      this.moveFarWallRightLeft();
+      const boosterOpen = this.property.BoosterOpenContain.children;
+      for (let i = 0; i < boosterOpen.length; i++) {
+        if (boosterOpen[i] === otherCollider.node) {
+          boosterOpen[i].active = false;
+
+          setTimeout(() => {
+            setTimeout(() => {
+              this.spawnBoosterOpen(1);
+            }, 500);
+            boosterOpen[i].active = true;
+          }, 2500);
+        }
+      }
     }
+
     if (this.score.heart <= 0) this.gameOver();
   }
 
@@ -318,7 +482,7 @@ export class GameController extends Component {
 
   private changeDirectionBall(): void {
     if (this.countObstacle <= 5) this.countObstacle = this.score.currentScore / 15 + 1;
-    if ( this.score.currentScore < 15 ) this.countObstacle = 2;
+    if (this.score.currentScore < 15) this.countObstacle = 2;
 
     if (
       this.score.currentScore > 1 &&
@@ -333,65 +497,128 @@ export class GameController extends Component {
       this.score.currentScore > 1 &&
       this.boomCount < 2 &&
       this.countTouch % 6 === 0
-    )
-      this.spawnBoom(2);
+    ) {
+      this.spawnBoom(1);
+      this.spawnBoom(1);
+    }
 
     if (
       this.score.currentScore > 1 &&
       this.boomColorCount < 2 &&
-      this.countTouch % 10 === 0
-    )
+      this.countTouch % 5 === 0
+    ) {
       this.spawnBoomColor(1);
+    }
+
+    if (
+      this.score.currentScore > 1 &&
+      this.heartCount < 2 &&
+      this.countTouch % 6 === 0
+    ) {
+      this.spawnHeart(1);
+      this.spawnHeart(1);
+    }
+
+    if (
+      this.score.currentScore > 1 &&
+      this.boosterCloseCount < 2 &&
+      this.countTouch % 3 === 0
+    ) {
+      this.spawnBoosterClose(1);
+      this.spawnBoosterClose(1);
+    }
+
+    if (
+      this.score.currentScore > 1 &&
+      this.boosterOpenCount < 2 &&
+      this.countTouch % 6 === 0
+    ) {
+      this.spawnBoosterOpen(1);
+      this.spawnBoosterOpen(1);
+    }
 
     this.property.StarPointContain.active = this.score.currentScore % 2 === 0;
     this.property.BoomContain.active = this.countTouch % 6 === 0;
-    this.property.BoomColorContain.active = this.countTouch % 10 === 0;
+    this.property.BoomColorContain.active = this.countTouch % 5 === 0;
+    this.property.HeartPrefabContain.active = this.countTouch % 6 === 0;
+    this.property.BoosterCloseContain.active = this.countTouch % 3 === 0;
+    this.property.BoosterOpenContain.active = this.countTouch % 6 === 0;
   }
 
   //------ spawn prefab--------------
+
+  private spawnHeart(count: number): void {
+    const heartPrefab = this.property.HeartPrefab;
+    const heartContain = this.property.HeartPrefabContain;
+
+    heartContain.removeAllChildren();
+    this.heartCount += this.spawnPrefab(heartPrefab, heartContain, count);
+  }
+
+  private spawnBoosterClose(count: number): void {
+    const closePrefab = this.property.BoosterClosePrefab;
+    const closePrefabContain = this.property.BoosterCloseContain;
+
+    closePrefabContain.removeAllChildren();
+
+    const randomCount = Math.floor(Math.random() * 2) + 1;
+
+    this.boosterCloseCount += randomCount;
+    this.spawnPrefab(closePrefab, closePrefabContain, randomCount);
+  }
+
+
+  private spawnBoosterOpen(count: number): void {
+    const openPrefab = this.property.BoosterOpenPrefab;
+    const openPrefabContain = this.property.BoosterOpenContain;
+
+    openPrefabContain.removeAllChildren();
+    this.boosterOpenCount += this.spawnPrefab(openPrefab, openPrefabContain, count);
+  }
+
   private spawnPrefab(prefab: Prefab, container: Node, count: number) {
     container.removeAllChildren();
 
     for (let i = 0; i < count; i++) {
-        const objectInstance = instantiate(prefab);
+      const objectInstance = instantiate(prefab);
 
-        const maxX = container.width / 2;
-        const maxY = container.height / 2;
-        const randomX = Math.random() * (maxX * 2) - maxX;
-        const randomY = Math.random() * (maxY * 2) - maxY;
+      const maxX = container.width / 2;
+      const maxY = container.height / 2;
+      const randomX = Math.random() * (maxX * 2) - maxX;
+      const randomY = Math.random() * (maxY * 2) - maxY;
 
-        objectInstance.setPosition(randomX, randomY, 0);
-        container.addChild(objectInstance);
-        objectInstance.active = true;
+      objectInstance.setPosition(randomX, randomY, 0);
+      container.addChild(objectInstance);
+      objectInstance.active = true;
     }
     return count;
-}
+  }
 
-public spawnStarPoint(count: number): void {
+  public spawnStarPoint(count: number): void {
     const starPrefab = this.property.StarPoint;
     const starContain = this.property.StarPointContain;
 
     starContain.removeAllChildren();
     this.starPointCount += this.spawnPrefab(starPrefab, starContain, count);
-}
+  }
 
-public spawnBoom(count: number): void {
+  public spawnBoom(count: number): void {
     const boomPrefab = this.property.BoomPrefab;
     const boomContain = this.property.BoomContain;
 
     boomContain.removeAllChildren();
     this.boomCount += this.spawnPrefab(boomPrefab, boomContain, count);
-}
+  }
 
-public spawnBoomColor(count: number): void {
+  public spawnBoomColor(count: number): void {
     const boomColorPrefab = this.property.BoomColorPrefab;
     const boomColorContain = this.property.BoomColorContain;
 
     boomColorContain.removeAllChildren();
     this.boomColorCount += this.spawnPrefab(boomColorPrefab, boomColorContain, count);
-}
+  }
 
-  private onClickReplay():void {
+  private onClickReplay(): void {
     this.audioControl.onAudioArray(5);
     this.gameView.interactableBtnPause();
 
@@ -400,7 +627,7 @@ public spawnBoomColor(count: number): void {
 
   private gameOver(): void {
     this.gameCenter.completeMatch(() => {
-    }, {score: this.score.getScore()});
+    }, { score: this.score.getScore() });
 
     input.off(Input.EventType.TOUCH_START);
     this.property.AnimContain.active = false;
