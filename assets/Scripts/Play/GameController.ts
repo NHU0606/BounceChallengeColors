@@ -1,4 +1,3 @@
-import { StoreAPI } from "../GameCenter/StoreAPI";
 import {
   _decorator,
   Animation,
@@ -24,18 +23,18 @@ import {
 import { Score } from "../Score";
 import { Property } from "../Property";
 import { BallController } from "./BallController";
-import { GameCenterController } from "../GameCenter/GameCenterController";
 import { AudioController } from "../AudioController";
 import { GameView } from "../GameView";
 import { ShopValue } from "../ShopValue";
 import Constants from "../Data/Constants";
-import { DataUser } from "../DataUser";
+import { RequestController } from "../RequestController";
+import { Data, DataUser } from "../DataUser";
 const { ccclass, property } = _decorator;
 
 @ccclass("GameController")
 export class GameController extends Component {
-  @property({ type: GameCenterController })
-  private gameCenter: GameCenterController;
+  @property({ type: RequestController })
+    private request: RequestController;
 
   @property({ type: Label })
   private highScore: Label;
@@ -69,16 +68,13 @@ export class GameController extends Component {
   private boomCount: number = 0;
   private heartCount: number = 0;
   private boosterCloseCount: number = 0;
+  private isGameOver: boolean = false;
   private boosterOpenCount: number = 0;
   private boomColorCount: number = 0;
-  private intervalChecklog;
-  private timeCheckLog: number = 0;
   private touchWal: boolean = false;
 
   protected onLoad(): void {
-    this.intervalChecklog = setInterval(() => {
-      this.timeCheckLog++;
-    }, 1000)
+    localStorage.setItem('highscore', '0')
 
     if (find("Shop") != null) {
       this.shop = find("Shop").getComponent(ShopValue).StoreModel;
@@ -88,7 +84,8 @@ export class GameController extends Component {
   }
 
   protected start(): void {
-    this.gameCenter.startMatch(() => {
+    this.isGameOver = false;
+
       this.property.GameNodeFake.active = true;
       this.property.GameNode.active = true;
 
@@ -113,7 +110,6 @@ export class GameController extends Component {
       for (let i = 0; i < 6; i++) {
         this.laneObstacle[i] = [];
       }
-    })
   }
 
   protected update(dt: number): void {
@@ -122,9 +118,6 @@ export class GameController extends Component {
 
   private getRandomFunction(): Function {
     const functions = [
-      // this.moveCloseWallRightLeft,
-      // this.moveCloseWallRight,
-      // this.moveCloseWallLeft,
       this.moveCloseTopBot,
       this.moveCloseBot,
       this.moveCloseTop
@@ -171,14 +164,6 @@ export class GameController extends Component {
 
     this.moveWall(this.property?.LeftWall.position.x - 30, this.property?.RightWall.position.x + 30);
   }
-
-  // private moveCloseWallRight(): void {
-  //   this.moveWall(-270, 220);
-  // }
-
-  // private moveCloseWallLeft(): void {
-  //   this.moveWall(-220, 270);
-  // }
 
   // tween move wall top + right
 
@@ -262,15 +247,6 @@ export class GameController extends Component {
         this.property.BallNode.position.y,
         0
       );
-
-      let logGame = {
-        seconds: this.timeCheckLog,
-        score: this.score.currentScore,
-        datetime: new Date().toLocaleString()
-      };
-
-      if (this.score.currentScore % 10 === 0) this.gameCenter.setGameData(logGame);
-
 
       const starts = this.property.StarPointContain.children;
       for (let i = 0; i < starts.length; i++) {
@@ -626,8 +602,7 @@ export class GameController extends Component {
   }
 
   private gameOver(): void {
-    this.gameCenter.completeMatch(() => {
-    }, { score: this.score.getScore() });
+    this.isGameOver = true;
 
     input.off(Input.EventType.TOUCH_START);
     this.property.AnimContain.active = false;
@@ -652,9 +627,16 @@ export class GameController extends Component {
   }
 
   private showScoreResult(): void {
-    DataUser.dataUser.data.cost += this.score.currentScore;
+    Data.costShop += this.score.currentScore;
 
     this.urScore.string = this.score.currentScore.toString();
-    this.highScore.string = DataUser.dataUser.data.highscore.toString();
+
+    let maxScore = 0;
+        let res = this.request.get('/max_score');
+        res.then(r => {
+            maxScore = r['score'];
+    
+            this.highScore.string = `${maxScore}`;
+        })
   }
 }

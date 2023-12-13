@@ -6,8 +6,5 @@ export default class Constants {
         Loading: 'Loading',
         Logo: 'Logo'
     }
-
-    public static NODE_NAME = {
-        GameClient: 'GameClient'
-    }
 }
+

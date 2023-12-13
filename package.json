@@ -5,9 +5,7 @@
     "version": "3.7.2"
   },
   "dependencies": {
-    "@onechaintech/gamesdk": "^0.0.29",
     "@onechaintech/gamesdk-beta": "^0.0.18",
-    "@onechaintech/gamesdk-dev": "^0.0.29",
     "@onechaintech/gamesdk-stg": "^0.0.9"
   }
 }
