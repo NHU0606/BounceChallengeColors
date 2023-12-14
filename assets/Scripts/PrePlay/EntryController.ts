@@ -71,7 +71,6 @@ export class EntryController extends Component {
   }
 
   private onClickBtnPlay(): void {
-    this.audioControl.onAudioArray(5);
     this.playBtn.interactable = false;
     this.animLoad.active = true;
 

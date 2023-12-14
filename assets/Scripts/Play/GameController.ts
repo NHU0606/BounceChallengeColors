@@ -26,9 +26,9 @@ import { BallController } from "./BallController";
 import { AudioController } from "../AudioController";
 import { GameView } from "../GameView";
 import { ShopValue } from "../ShopValue";
-import Constants from "../Data/Constants";
+import Constants, { AudioType } from "../Data/Constants";
 import { RequestController } from "../RequestController";
-import { Data, DataUser } from "../DataUser";
+import { Data } from "../DataUser";
 const { ccclass, property } = _decorator;
 
 @ccclass("GameController")
@@ -44,6 +44,9 @@ export class GameController extends Component {
 
   @property({ type: Property })
   private property: Property;
+
+  @property({ type: Node })
+  private audioNode: Node;
 
   @property({ type: AudioController })
   private audioControl: AudioController;
@@ -200,7 +203,7 @@ export class GameController extends Component {
     if (otherTag === 12) {
       this.countTouch++;
       this.touchWal = true;
-      this.audioControl.onAudioArray(4);
+      this.audioControl.playSound(AudioType.TouchWall);
       this.animContain.play("BallBounce");
       this.property.BallControl.touchRightWall();
       this.property.AnimContain.setPosition(
@@ -215,7 +218,7 @@ export class GameController extends Component {
       this.touchWal = true;
       this.countTouch++;
       this.property.BallControl.touchLeftWall();
-      this.audioControl.onAudioArray(4);
+      this.audioControl.playSound(AudioType.TouchWall);
       this.animContain.play("BallBounce");
       this.property.AnimContain.setPosition(
         this.property.BallNode.position.x,
@@ -227,10 +230,10 @@ export class GameController extends Component {
       this.property.RightContain.active = true;
     }
     else if (otherTag === 1) {
-      this.audioControl.onAudioArray(1);
+      this.audioControl.playSound(AudioType.BallDie);
       this.score.minus3Heart();
     } else if (otherTag === 3) {
-      this.audioControl.onAudioArray(1);
+      this.audioControl.playSound(AudioType.BallDie);
       this.score.minusHeart();
       this.animContain.play("BallGameOver");
       this.property.AnimContain.setPosition(
@@ -239,7 +242,7 @@ export class GameController extends Component {
         0
       );
     } else if (otherTag === 4) {
-      this.audioControl.onAudioArray(3);
+      this.audioControl.playSound(AudioType.EatBoosterGood);
       this.score.addStar();
       this.animStar.play("TouchStar");
       this.property.AnimTouchStar.setPosition(
@@ -268,7 +271,7 @@ export class GameController extends Component {
         }
       }
     } else if (otherTag === 5) {
-      this.audioControl.onAudioArray(1);
+      this.audioControl.playSound(AudioType.BallDie);
       this.score.minusHeart();
       this.animContain.play("BallGameOver");
       this.property.AnimContain.setPosition(
@@ -291,7 +294,7 @@ export class GameController extends Component {
         }
       }
     } else if (otherTag === 6) {
-      this.audioControl.onAudioArray(3);
+      this.audioControl.playSound(AudioType.EatBoosterGood);
 
       const newColor = this.gameView.getRandomColor();
       const leftLine = this.property.LeftLine.getComponent(Sprite);
@@ -333,7 +336,7 @@ export class GameController extends Component {
       this.applyColorToObstacles(this.property.LeftContain, leftLine.color);
       this.applyColorToObstacles(this.property.RightContain, leftLine.color);
     } else if (otherTag === 10) {
-      this.audioControl.onAudioArray(3);
+      this.audioControl.playSound(AudioType.EatBoosterGood);
       this.score.plusHeart();
 
       const hearts = this.property.HeartPrefabContain.children;
@@ -350,7 +353,7 @@ export class GameController extends Component {
         }
       }
     } else if (otherTag === 14) {
-      this.audioControl.onAudioArray(3);
+      this.audioControl.playSound(AudioType.BallDie);
 
       this.moveCloseWallRightLeft();
       const boosterClose = this.property.BoosterCloseContain.children;
@@ -367,7 +370,7 @@ export class GameController extends Component {
         }
       }
     } else if (otherTag === 15) {
-      this.audioControl.onAudioArray(3);
+      this.audioControl.playSound(AudioType.EatBoosterGood);
 
       this.moveFarWallRightLeft();
       const boosterOpen = this.property.BoosterOpenContain.children;
@@ -595,7 +598,6 @@ export class GameController extends Component {
   }
 
   private onClickReplay(): void {
-    this.audioControl.onAudioArray(5);
     this.gameView.interactableBtnPause();
 
     director.loadScene(Constants.SCENE_NAME.Play);
@@ -618,7 +620,7 @@ export class GameController extends Component {
     this.gameView.updateStars();
     setTimeout(() => {
       this.property.ShopBtn.node.active = true;
-      this.property.ContainImgSoundContain.active = true;
+      this.audioNode.active = true;
       this.property.GameNodeFake.active = false;
       this.property.NontifiOver.active = false;
       this.property.OverNode.active = true;

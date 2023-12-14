@@ -1,4 +1,5 @@
 import { AudioController } from "../AudioController";
+import { AudioType } from "../Data/Constants";
 import { Score } from '../Score';
 import { _decorator, Component, EventTouch, input, Input, Node, Vec3 } from 'cc';
 const { ccclass, property } = _decorator;
@@ -32,7 +33,7 @@ export class BallController extends Component {
     private onTouchStart(event: EventTouch): void {
         this.speed.y = 5; 
         this.jump = true;
-        this.audioControl.onAudioArray(6); 
+        this.audioControl.playSound(AudioType.ClickJump);
     }
 
     protected update(dt: number): void {

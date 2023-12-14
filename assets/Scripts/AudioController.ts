@@ -1,133 +1,64 @@
-import { _decorator, AudioClip, AudioSource, Component, Node, Sprite, sys } from 'cc';
+import { _decorator, AudioClip, AudioSource, Button, Component, Node, Sprite, SpriteFrame } from 'cc';
+import { AudioType } from './Data/Constants';
 import { Data } from './DataUser';
 const { ccclass, property } = _decorator;
 
 @ccclass('AudioController')
 export class AudioController extends Component {
-    private isIconShown: boolean = false;
-  private isMuted: boolean = false;
-  private variableVolumeArray: number[] = [];
-  private variableVolume: number;
-  private convertVolume: number;
+    @property({ type: AudioSource })
+    private audioSource: AudioSource;
 
-  @property(AudioSource)
-  public audioBackground: AudioSource = null;
+    @property({ type: Button })
+    private buttonSound: Button;
 
-  @property({ type: AudioSource })
-  private soundMachine: AudioSource;
+    @property({ type: Sprite })
+    private spriteSound: Sprite;
 
-  @property({ type: [AudioClip] })
-  private arrayAudio: AudioClip[] = [];
+    @property({ type: SpriteFrame })
+    private frameSoundOn: SpriteFrame;
 
-  @property({ type: Sprite })
-  private iconToShow: Sprite = null;
+    @property({ type: SpriteFrame })
+    private frameSoundOff: SpriteFrame;
 
-  @property({ type: Sprite })
-  private iconToHide: Sprite = null;
+    @property({ type: AudioClip })
+    private listAudioClip: AudioClip[] = [];
 
-  protected start(): void {
-    this.iconToShow.node.active = true;
-    this.iconToHide.node.active = false;
+    @property({ type: Button })
+    private listButton: Button[] = [];
 
-    try {
-      var getVolumne = sys.localStorage.getItem(Data.sound);
+    protected onLoad(): void {
+        this.buttonSound?.node.on(Button.EventType.CLICK, () => {
+          Data.gameVolume = Data.gameVolume ? 0 : 1,
+            this.updateSound();
+        })
+    }
 
-      if (getVolumne) {
-        this.variableVolumeArray = JSON.parse(getVolumne);
-        localStorage.setItem(
-          Data.sound,
-          JSON.stringify(this.variableVolumeArray)
-        );
-        this.convertVolume =
-          this.variableVolumeArray[this.variableVolumeArray.length - 1];
+    protected start(): void {
+        this.updateSound();
+        this.listButton.map((button) => {
+            button.node.on(Button.EventType.CLICK, () => {
+                this.playSound(AudioType.ClickBtn)
+            })
+        })
+    }
 
-        if (this.convertVolume === 1) {
-          this.onAudio();
-        } else if (this.convertVolume === 0) {
-          this.offAudio();
+    public turnOffBtnSound(): void {
+        this.buttonSound.interactable = false;
+    }
+
+    public playSound(type: AudioType): void {
+        this.audioSource.playOneShot(this.listAudioClip[type], Data.gameVolume);
+    }
+
+    public updateSound(): void {
+        if ( Data.gameVolume === 0 ) { 
+            this.audioSource.stop();
+            this.spriteSound && (this.spriteSound.spriteFrame = this.frameSoundOff);
+        } else {
+            this.audioSource.play();
+            this.spriteSound && (this.spriteSound.spriteFrame = this.frameSoundOn);
         }
-      } else {
-        if (Data.soundStatic === 1) {
-          this.onAudio();
-        } else if (Data.soundStatic === 0) {
-          this.offAudio();
-        }
-      }
-    } catch (error) {
-      if (Data.soundStatic === 1) {
-        this.onAudio();
-      } else if (Data.soundStatic === 0) {
-        this.offAudio();
-      }
     }
-  }
-
-  public onAudioArray(index: number): void {
-    let clip: AudioClip = this.arrayAudio[index];
-    this.soundMachine.playOneShot(clip);
-  }
-
-  protected onAudio(): void {
-    this.iconToShow.node.active = true;
-    this.iconToHide.node.active = false;
-    this.variableVolume = 1;
-    this.audioBackground.play();
-    this.variableVolumeArray.push(this.variableVolume);
-
-    try {
-      sys.localStorage.setItem(
-        Data.sound,
-        JSON.stringify(this.variableVolumeArray)
-      );
-      Data.soundStatic = 1;
-    } catch (error) {
-      Data.soundStatic = 1;
-    }
-    this.soundMachine.volume = 1;
-
-    this.audioBackground.volume = 1;
-  }
-
-  protected offAudio(): void {
-    this.iconToShow.node.active = false;
-    this.iconToHide.node.active = true;
-
-    this.variableVolume = 0;
-    this.audioBackground.pause();
-    this.variableVolumeArray.push(this.variableVolume);
-
-    try {
-      sys.localStorage.setItem(
-        Data.sound,
-        JSON.stringify(this.variableVolumeArray)
-      );
-      Data.soundStatic = 0;
-    } catch (error) {
-      Data.soundStatic = 0;
-    }
-    this.soundMachine.volume = 0;
-
-    this.audioBackground.volume = 0;
-  }
-
-  public onClickIcon() {
-    this.isMuted = !this.isMuted;
-    if (this.isMuted) {
-      Data.soundStatic = 0;
-      this.audioBackground.volume = 0;
-    } else {
-      Data.soundStatic = 1;
-      this.audioBackground.volume = 1;
-    }
-  }
-
-  public onToggleButtonClicked() {
-    this.isIconShown = !this.isIconShown;
-    this.updateIconsVisibility();
-  }
-
-  public updateIconsVisibility() {
-    this.iconToShow.node.active = this.isIconShown;
-    this.iconToHide.node.active = !this.isIconShown;
-  }
 }
+
+

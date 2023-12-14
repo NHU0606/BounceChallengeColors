@@ -8,3 +8,10 @@ export default class Constants {
     }
 }
 
+export enum AudioType{
+    ClickBtn,
+    EatBoosterGood,
+    TouchWall,
+    BallDie,
+    ClickJump
+}

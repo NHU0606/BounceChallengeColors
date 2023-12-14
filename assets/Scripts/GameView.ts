@@ -2,7 +2,6 @@ import { Property } from './Property';
 import { _decorator, Color, Component, director, instantiate, Label, Node, Prefab, Sprite, SpriteFrame, tween, UIOpacity, Vec3 } from 'cc';
 import { Score } from './Score';
 import { AudioController } from "./AudioController";
-import { Data, DataUser } from './DataUser';
 import Constants from './Data/Constants';
 const { ccclass, property } = _decorator;
 
@@ -100,15 +99,13 @@ export class GameView extends Component {
     }
 
     private onClickPause(): void {
-        this.audioControl.onAudioArray(5);
-
-      this.property.ShopBtn.node.active = true;
+        this.property.ShopBtn.node.active = true;
         let opacityBtnPause = this.property.PauseBtn.getComponent(UIOpacity)
         opacityBtnPause.opacity = 0;
         this.property.PauseInfo.active = true;
         this.property.PauseBtn.interactable = false;
         this.property.GameNode.active = false;
-        this.property.ContainImgSoundContain.active = true;
+        this.audioControl.node.active = true;
         this.property.TopContain.active = false;
         this.property.BottomContain.active = false;
         this.property.GameNodeFake.active = false;
@@ -116,9 +113,8 @@ export class GameView extends Component {
     }
 
     private onClickContinuePause(): void {
-        this.audioControl.onAudioArray(5);
         this.property.ShopBtn.node.active = false;
-        this.property.ContainImgSoundContain.active = false;
+        this.audioControl.node.active = false;
 
         let opacityBtnPause = this.property.PauseBtn.getComponent(UIOpacity)
         opacityBtnPause.opacity = 255;
@@ -133,7 +129,6 @@ export class GameView extends Component {
 
     private onClickHomePause(): void {
         this.interactableBtnPause();
-        this.audioControl.onAudioArray(5);
         director.loadScene(Constants.SCENE_NAME.Entry);
     }
 
@@ -150,7 +145,6 @@ export class GameView extends Component {
     }
 
     private onClickShopBtn(): void {
-        this.audioControl.onAudioArray(5);
         director.loadScene(Constants.SCENE_NAME.Shop);
     }
 

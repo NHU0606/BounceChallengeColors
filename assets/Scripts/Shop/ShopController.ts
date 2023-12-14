@@ -3,7 +3,7 @@ import { ShopView } from './ShopView';
 import { ShopModel } from './ShopModel';
 import { AudioController } from "../AudioController";
 import { ShopValue } from '../ShopValue';
-import { Data, DataUser } from '../DataUser';
+import { Data } from '../DataUser';
 import Constants from '../Data/Constants';
 const { ccclass, property } = _decorator;
 
@@ -33,7 +33,7 @@ export class ShopController extends Component {
     private scoreShop: number = 0;
 
     protected onLoad(): void {
-
+        
         this.scoreShop = Data.costShop;
         this.shopView.CostLabel.string = `Score: ` + this.scoreShop;
         if (find('Shop') === null) {
@@ -97,29 +97,23 @@ export class ShopController extends Component {
     }
 
     private onClickCloseBtnNocost(): void {
-        this.audioControl.onAudioArray(5);
         this.shopView.NoCost.active = false;
     }
 
     private onClickChooseCloseBtn(): void {
-        this.audioControl.onAudioArray(5);
         this.shopView.ChooseCloseBtn.interactable = false;
         this.shopView.ChooseBtn.interactable = false;
         this.shopView.ChooseNode.active = false;
     }
 
     private onClickChooseBall(): void {
-        this.audioControl.onAudioArray(5);
-
         this.shopView.ChooseCloseBtn.interactable = false;
         this.shopView.ChooseBtn.interactable = false;
         director.loadScene(Constants.SCENE_NAME.Play);
     }
 
     private onClickCloseMainBtn(): void {
-        this.audioControl.onAudioArray(5);
         this.shopView.CloseMainBtn.interactable = false;
-
         director.loadScene(Constants.SCENE_NAME.Play);
     }
 }

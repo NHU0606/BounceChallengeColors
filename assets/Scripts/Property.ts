@@ -283,13 +283,6 @@ export class Property extends Component {
         return this.boomColorContain;
     }
 
-    @property({ type: Node })
-    private containImgSoundContain: Node;
-    
-    public get ContainImgSoundContain() : Node {
-        return this.containImgSoundContain;
-    }
-
     @property({ type: Sprite })
     private ballSprite: Sprite;
     
