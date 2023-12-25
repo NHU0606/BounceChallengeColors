@@ -41,6 +41,8 @@ export class EntryController extends Component {
   @property({ type: Node })
   private warnNode: Node;
 
+  private nickname;
+
   protected onLoad(): void {
     this.playBtn.interactable = true;
 
@@ -52,29 +54,30 @@ export class EntryController extends Component {
   }
 
   private async onInputSubmitted(): Promise<void> {
-    const nickname = this.nickNameLabel.string;
+    
+    this.nickname = this.nickNameLabel.string;
     let formData = new FormData();
-    formData.append("username", nickname);
+    formData.append("username", this.nickname);
 
     let res = this.requestController.post_without_header(formData, '/check_user');
     res.then(r => {
       console.log(r);
 
-      if (r['token'] != '') {
-        localStorage.setItem('token', JSON.stringify(r['token']));
-        director.loadScene('Play');
-      } else {
+      if (r['username'] != this.nickname) {
         this.warnNode.active = true;
-        console.log("auth")
+      } else {
+        this.playBtn.interactable = false;
+        this.animLoad.active = true;
+        // director.loadScene('Play');
+        if (r['token'] != '') {
+          localStorage.setItem('token', JSON.stringify(r['token']));
+          director.loadScene('Play');
+        } else {
+          console.log("auth")
+        }
       }
+
     })
-  }
-
-  private onClickBtnPlay(): void {
-    this.playBtn.interactable = false;
-    this.animLoad.active = true;
-
-    director.loadScene(Constants.SCENE_NAME.Play);
   }
 
   private onClickOkBtn(): void {

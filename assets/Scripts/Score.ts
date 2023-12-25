@@ -41,6 +41,10 @@ export class Score extends Component {
         this.updateScore(this.currentScore + 3);
     }
 
+    public addScore(): void {
+        this.updateScore(this.currentScore + 1);
+    }
+
     async updateScore(num:number){
         this.currentScore = num;
         this.scoreLabel.string = String(this.currentScore);
@@ -56,10 +60,7 @@ export class Score extends Component {
         }
     }
 
-    public addScore(): void {
-        this.updateScore(this.currentScore + 1);
-    }
-
+    
     public getScore(): number {
         return this.currentScore;
     }

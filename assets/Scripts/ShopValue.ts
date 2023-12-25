@@ -17,4 +17,3 @@ export class ShopValue extends Component {
     }
 }
 
-// ok

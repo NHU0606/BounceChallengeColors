@@ -33,7 +33,6 @@ export class ShopController extends Component {
     private scoreShop: number = 0;
 
     protected onLoad(): void {
-        
         this.scoreShop = Data.costShop;
         this.shopView.CostLabel.string = `Score: ` + this.scoreShop;
         if (find('Shop') === null) {
